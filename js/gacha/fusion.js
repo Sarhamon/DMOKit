@@ -69,18 +69,18 @@ function pickAutoConsume(grade, count) {
 
 function fuseOne(group, consumedNames) {
     consumeItems(consumedNames);
-    const result = maybeUpgrade(pullOne(group.results));
+    const result = maybeUpgrade(pullOne(group.results), group.results);
     addItems([{ name: result.name, grade: result.grade }]);
     let pityResult = null;
     if (group.pity) {
         const counter = incrementPity(group.name);
         if (counter >= group.pity.every) {
-            pityResult = maybeUpgrade(pullOne(group.pity.results));
+            pityResult = maybeUpgrade(pullOne(group.pity.results), group.pity.results);
             addItems([{ name: pityResult.name, grade: pityResult.grade }]);
             resetPity(group.name);
         }
     }
-    return { result, pityResult };
+    return { result, pityResult, sourceGrade: group.inputGrade };
 }
 
 function updateFusionAvail() {
@@ -176,7 +176,8 @@ function renderResults(batches, requestedTickets, executedTickets) {
         const extra = b.result._upgraded ? 'upgraded' : '';
         cards.push(flipCardWrap(back, gradeClass(b.result.grade), extra));
         if (b.pityResult) {
-            const pityBack = buildFlipBack(b.pityResult, ' ⭐', '<span class="pity-tag">천장 보너스</span>');
+            const pityLabel = `<span class="pity-tag">${escapeHtml(b.sourceGrade)} 합성 천장</span>`;
+            const pityBack = buildFlipBack(b.pityResult, ' ⭐', pityLabel);
             const pityExtra = 'pity-card' + (b.pityResult._upgraded ? ' upgraded' : '');
             cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), pityExtra));
         }
