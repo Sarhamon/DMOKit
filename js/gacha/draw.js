@@ -71,12 +71,15 @@ function renderStats() {
     statTotal.textContent = `${stats.total.toLocaleString()}개 (${stats.tickets.toLocaleString()}회 사용)`;
     const grades = Object.keys(stats.byGrade).sort((a, b) => gradeRank(a) - gradeRank(b));
     if (grades.length === 0) {
-        statGradeList.innerHTML = '<span class="empty-msg-inline">아직 뽑은 결과가 없습니다.</span>';
+        statGradeList.innerHTML = stats.total > 0
+            ? '<span class="empty-msg-inline">카드를 공개하면 등급이 표시됩니다.</span>'
+            : '<span class="empty-msg-inline">아직 뽑은 결과가 없습니다.</span>';
         return;
     }
+    const revealedTotal = Object.values(stats.byGrade).reduce((s, v) => s + v, 0);
     statGradeList.innerHTML = grades.map(g => {
         const count = stats.byGrade[g];
-        const pct = ((count / stats.total) * 100).toFixed(2);
+        const pct = ((count / revealedTotal) * 100).toFixed(2);
         return `<span class="stat-grade ${gradeClass(g)}">
             <span class="g-label">${escapeHtml(g)}</span>
             <span class="g-count">${count}</span>
@@ -122,7 +125,6 @@ function renderResults(items) {
 function onCardReveal(card) {
     const grade = card.dataset.grade;
     if (!grade) return;
-    stats.total++;
     stats.byGrade[grade] = (stats.byGrade[grade] || 0) + 1;
     renderStats();
 }
@@ -135,6 +137,7 @@ function pull(tickets) {
         results.push(maybeUpgrade(pullOne(currentDraw), currentDraw.items));
     }
     stats.tickets += tickets;
+    stats.total += totalItems;
     addItems(results.map(r => ({ name: r.name, grade: r.grade })));
     renderStats();
     renderResults(results);
