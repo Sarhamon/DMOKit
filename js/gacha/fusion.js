@@ -8,11 +8,10 @@ import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
 import { maybeUpgrade } from './upgrade.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
+const FUSION_BATCH_SIZE = 10;
 
 const fusionAvail = document.getElementById('fusionAvail');
-const fuse1Btn = document.getElementById('fuse1Btn');
-const fuseNBtn = document.getElementById('fuseNBtn');
-const fuseNInput = document.getElementById('fuseNInput');
+const fuse10Btn = document.getElementById('fuse10Btn');
 const pityDisplay = document.getElementById('pityDisplay');
 const fusionResultGrid = document.getElementById('fusionResultGrid');
 const fusionResultCount = document.getElementById('fusionResultCount');
@@ -91,8 +90,7 @@ function updateFusionAvail() {
         totalPossible += Math.floor(avail / group.inputCount);
     }
     const enabled = totalPossible > 0;
-    if (fuse1Btn) fuse1Btn.disabled = !enabled;
-    if (fuseNBtn) fuseNBtn.disabled = !enabled;
+    if (fuse10Btn) fuse10Btn.disabled = !enabled;
     if (fusionAvail) {
         fusionAvail.textContent = enabled
             ? `총 ${totalPossible}회 합성 가능`
@@ -146,6 +144,22 @@ function renderInventory() {
     }).join('');
 }
 
+function buildFlipBack(it, gradeSuffix = '', extraHtml = '') {
+    if (!it._upgraded) {
+        return `<span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
+            <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}`;
+    }
+    return `<div class="back-stage back-stage-original ${gradeClass(it._orig.grade)}">
+        <span class="r-grade">${escapeHtml(it._orig.grade)}${gradeSuffix}</span>
+        <span class="r-name">${escapeHtml(it._orig.name)}</span>${extraHtml}
+    </div>
+    <div class="back-stage back-stage-upgraded ${gradeClass(it.grade)}">
+        <span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
+        <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}
+        <span class="upgrade-tag">⬆ 등급업</span>
+    </div>`;
+}
+
 function renderResults(batches, requestedTickets, executedTickets) {
     if (!fusionResultCount || !fusionResultGrid) return;
     const totalResults = batches.reduce((s, b) => s + 1 + (b.pityResult ? 1 : 0), 0);
@@ -155,59 +169,20 @@ function renderResults(batches, requestedTickets, executedTickets) {
     }
     fusionResultCount.textContent = suffix;
 
-    const flipMode = executedTickets === 1;
     const cards = [];
-
-    if (flipMode && totalResults > 1) cards.push(revealAllRowHTML());
-
-    function buildFlipBack(it, gradeSuffix = '', extraHtml = '') {
-        if (!it._upgraded) {
-            return `<span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
-                <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}`;
-        }
-        return `<div class="back-stage back-stage-original ${gradeClass(it._orig.grade)}">
-            <span class="r-grade">${escapeHtml(it._orig.grade)}${gradeSuffix}</span>
-            <span class="r-name">${escapeHtml(it._orig.name)}</span>${extraHtml}
-        </div>
-        <div class="back-stage back-stage-upgraded ${gradeClass(it.grade)}">
-            <span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
-            <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}
-            <span class="upgrade-tag">⬆ 등급업</span>
-        </div>`;
-    }
-
+    if (totalResults > 1) cards.push(revealAllRowHTML());
     for (const b of batches) {
-        const upTag = b.result._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
-        const pityUpTag = b.pityResult && b.pityResult._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
-        if (flipMode) {
-            const back = buildFlipBack(b.result);
-            const extra = b.result._upgraded ? 'upgraded' : '';
-            cards.push(flipCardWrap(back, gradeClass(b.result.grade), extra));
-            if (b.pityResult) {
-                const pityBack = buildFlipBack(b.pityResult, ' ⭐', '<span class="pity-tag">천장 보너스</span>');
-                const pityExtra = 'pity-card' + (b.pityResult._upgraded ? ' upgraded' : '');
-                cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), pityExtra));
-            }
-        } else {
-            const cls = `result-card ${gradeClass(b.result.grade)}${b.result._upgraded ? ' upgraded' : ''}`;
-            cards.push(`<div class="${cls}">
-                <span class="r-grade">${escapeHtml(b.result.grade)}</span>
-                <span class="r-name">${escapeHtml(b.result.name)}</span>
-                ${upTag}
-            </div>`);
-            if (b.pityResult) {
-                const pcls = `result-card pity-card ${gradeClass(b.pityResult.grade)}${b.pityResult._upgraded ? ' upgraded' : ''}`;
-                cards.push(`<div class="${pcls}">
-                    <span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
-                    <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
-                    <span class="pity-tag">천장 보너스</span>
-                    ${pityUpTag}
-                </div>`);
-            }
+        const back = buildFlipBack(b.result);
+        const extra = b.result._upgraded ? 'upgraded' : '';
+        cards.push(flipCardWrap(back, gradeClass(b.result.grade), extra));
+        if (b.pityResult) {
+            const pityBack = buildFlipBack(b.pityResult, ' ⭐', '<span class="pity-tag">천장 보너스</span>');
+            const pityExtra = 'pity-card' + (b.pityResult._upgraded ? ' upgraded' : '');
+            cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), pityExtra));
         }
     }
     fusionResultGrid.innerHTML = cards.length ? cards.join('') : '<div class="empty-msg">결과 없음</div>';
-    if (flipMode) setupFlip(fusionResultGrid);
+    setupFlip(fusionResultGrid);
 }
 
 function fuseAuto(tickets) {
@@ -244,23 +219,12 @@ function fuseAuto(tickets) {
     updateFusionAvail();
 }
 
-function onFuseN() {
-    if (!fuseNInput) return;
-    let n = parseInt(fuseNInput.value, 10);
-    if (isNaN(n) || n < 1) n = 1;
-    if (n > 10000) n = 10000;
-    fuseNInput.value = n;
-    fuseAuto(n);
-}
-
 function onClearInventory() {
     if (!confirm('인벤토리와 천장 카운터를 모두 초기화합니다. 계속하시겠습니까?')) return;
     clearAll();
 }
 
-if (fuse1Btn) fuse1Btn.addEventListener('click', () => fuseAuto(1));
-if (fuseNBtn) fuseNBtn.addEventListener('click', onFuseN);
-if (fuseNInput) fuseNInput.addEventListener('keydown', e => { if (e.key === 'Enter') onFuseN(); });
+if (fuse10Btn) fuse10Btn.addEventListener('click', () => fuseAuto(FUSION_BATCH_SIZE));
 if (clearInvBtn) clearInvBtn.addEventListener('click', onClearInventory);
 
 const modeButtons = document.querySelectorAll('.mode-btn');
