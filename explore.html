@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMO 탐험 효율 계산기</title>
+    <script>
+        if (localStorage.getItem('dmo_theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <meta property="og:title" content="DMO 탐험 계산기">
+    <meta property="og:description" content="디지몬 마스터즈 온라인 탐험 수치를 쉽고 빠르게 계산해보세요.">
+    <meta property="og:image" content="./GenAi_img2.png">
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="index.html" class="home-link" aria-label="메인 메뉴로">← 메인</a>
+        <div class="header-content">
+            <h2>DMO 탐험 효율 계산기</h2>
+            <p class="subtitle">Lv.140 ~ Lv.170 탐험 효율 분석</p>
+        </div>
+        <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
+    </div>
+
+    <nav class="mode-tabs">
+        <a href="#/normal" data-route="/normal" class="tab-link">판당 계산</a>
+        <a href="#/target" data-route="/target" class="tab-link">목표 레벨까지</a>
+    </nav>
+
+    <div class="card">
+        <section id="view-normal" data-view="/normal">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label for="userLevel">현재 레벨</label>
+                    <input type="number" id="userLevel" min="1" max="180" value="140">
+                </div>
+                <div class="input-wrapper">
+                    <label for="currentPercent">현재 경험치 (%)</label>
+                    <input type="number" id="currentPercent" min="0" max="99.9999" step="0.0001" value="0" placeholder="0.0000">
+                </div>
+                <div class="journal-radios">
+                    <label class="radio-option">
+                        <span class="label-text">미사용</span>
+                        <input type="radio" name="journal-normal" value="0" checked>
+                    </label>
+                    <label class="radio-option">
+                        <span class="label-text">일지 I</span>
+                        <input type="radio" name="journal-normal" value="1">
+                    </label>
+                    <label class="radio-option">
+                        <span class="label-text">일지 II</span>
+                        <input type="radio" name="journal-normal" value="2">
+                    </label>
+                </div>
+                <button class="calc-btn" id="normalCalcBtn">계산하기</button>
+            </div>
+
+            <div class="exp-display">
+                <span class="exp-label">필요 경험치: </span>
+                <span id="reqExpDisplay">-</span>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>순위</th>
+                            <th>탐험지</th>
+                            <th>입장제한</th>
+                            <th>시간</th>
+                            <th>판당 획득(%)</th>
+                            <th>종료 후(%)</th>
+                            <th>렙업까지</th>
+                            <th>시간당 효율</th>
+                            <th>총 소요 시간</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody">
+                        <tr><td class="empty-msg" colspan="9">계산 버튼을 눌러주세요.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-target" data-view="/target" hidden>
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label for="targetCurrentLevel">현재 레벨</label>
+                    <input type="number" id="targetCurrentLevel" min="1" max="169" value="140">
+                </div>
+                <div class="input-wrapper">
+                    <label for="targetCurrentPercent">현재 경험치 (%)</label>
+                    <input type="number" id="targetCurrentPercent" min="0" max="99.9999" step="0.0001" value="0" placeholder="0.0000">
+                </div>
+                <div class="input-wrapper">
+                    <label for="targetGoalLevel">목표 레벨</label>
+                    <input type="number" id="targetGoalLevel" min="2" max="170" value="170">
+                </div>
+                <div class="journal-radios">
+                    <label class="radio-option">
+                        <span class="label-text">미사용</span>
+                        <input type="radio" name="journal-target" value="0" checked>
+                    </label>
+                    <label class="radio-option">
+                        <span class="label-text">일지 I</span>
+                        <input type="radio" name="journal-target" value="1">
+                    </label>
+                    <label class="radio-option">
+                        <span class="label-text">일지 II</span>
+                        <input type="radio" name="journal-target" value="2">
+                    </label>
+                </div>
+                <button class="calc-btn" id="targetCalcBtn">계산하기</button>
+            </div>
+
+            <div class="exp-display">
+                <span class="exp-label">목표: </span>
+                <span id="targetSummary">-</span>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구간</th>
+                            <th>탐험지</th>
+                            <th>회수</th>
+                            <th>소요 시간</th>
+                        </tr>
+                    </thead>
+                    <tbody id="targetResultBody">
+                        <tr><td class="empty-msg" colspan="4">계산 버튼을 눌러주세요.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="js/explore/main.js"></script>
+</body>
+</html>

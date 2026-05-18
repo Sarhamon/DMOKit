@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMOKit - 데이터 융합 시뮬레이터</title>
+    <script>
+        if (localStorage.getItem('dmo_theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <meta property="og:title" content="DMOKit - 데이터 융합 시뮬레이터">
+    <meta property="og:description" content="디지몬 마스터즈 데이터 융합 - 천장 시스템 포함">
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="gacha.html" class="home-link" aria-label="가챠 메뉴로">← 가챠</a>
+        <div class="header-content">
+            <h2>데이터 융합 시뮬레이터</h2>
+            <p class="subtitle">동일 등급 4개 → 결과 1개 (천장 시스템 포함)</p>
+        </div>
+        <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
+    </div>
+
+    <div class="inv-bar">
+        <span id="invCount">인벤토리: 0개</span>
+        <a href="draw.html" class="inv-link">← 드로우로</a>
+    </div>
+
+    <div class="card">
+        <div class="fusion-controls">
+            <div class="fusion-group-row">
+                <label for="fusionSelect">합성 그룹</label>
+                <select id="fusionSelect"></select>
+                <span class="fusion-avail" id="fusionAvail">—</span>
+            </div>
+
+            <div class="fusion-mode-toggle">
+                <button class="mode-btn active" data-mode="auto">자동</button>
+                <button class="mode-btn" data-mode="manual">수동</button>
+            </div>
+
+            <div class="mode-pane" id="autoPane">
+                <button class="calc-btn" id="fuse1Btn">1회 합성</button>
+                <div class="multi-pull">
+                    <button class="calc-btn" id="fuseNBtn">N회 합성</button>
+                    <input type="number" id="fuseNInput" min="1" max="10000" value="10">
+                </div>
+            </div>
+
+            <div class="mode-pane hidden" id="manualPane">
+                <div class="manual-hint" id="manualHint">아래 인벤토리에서 동일 등급 아이템 4개를 클릭하세요.</div>
+                <div class="manual-slots" id="manualSlots"></div>
+                <div class="manual-actions">
+                    <button class="calc-btn" id="fuseManualBtn" disabled>합성 (0/4)</button>
+                    <button class="calc-btn secondary" id="clearSelBtn">선택 초기화</button>
+                </div>
+            </div>
+
+            <div class="pity-display" id="pityDisplay"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="section-title">최근 결과 <span class="result-count" id="fusionResultCount"></span></h3>
+        <div class="result-grid" id="fusionResultGrid">
+            <div class="empty-msg">합성 버튼을 눌러주세요.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="inv-header">
+            <h3 class="section-title">인벤토리</h3>
+            <button class="calc-btn secondary" id="clearInvBtn">인벤토리 비우기</button>
+        </div>
+        <div class="inv-summary" id="invSummary">—</div>
+        <div class="inv-grid" id="invGrid">
+            <div class="empty-msg">드로우 결과가 이곳에 쌓입니다.</div>
+        </div>
+    </div>
+
+    <script type="module" src="js/gacha/fusion.js"></script>
+</body>
+</html>
