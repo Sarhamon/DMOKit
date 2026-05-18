@@ -500,46 +500,6 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
 }
 
 .mode-pane { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.mode-pane.hidden { display: none; }
-
-.manual-hint { width: 100%; color: var(--sub-text); font-size: 0.9rem; }
-.manual-slots {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    width: 100%;
-}
-@media (max-width: 600px) {
-    .manual-slots { grid-template-columns: repeat(2, 1fr); }
-}
-.manual-slot {
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px dashed var(--card-border);
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--sub-text);
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-.manual-slot.filled {
-    border: 2px solid var(--accent-color);
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-weight: 600;
-    cursor: pointer;
-}
-.manual-slot.filled:hover { background-color: var(--card-border); }
-.manual-slot .slot-remove {
-    position: absolute;
-    top: 4px; right: 6px;
-    color: var(--rank1-text);
-    font-weight: bold;
-}
-.manual-actions { display: flex; gap: 8px; width: 100%; }
 
 /* ===== Pity progress ===== */
 .pity-display { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
@@ -560,6 +520,12 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
 /* ===== Inventory display ===== */
 .inv-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .inv-header .section-title { margin: 0; }
+.inv-header .calc-btn {
+    height: auto;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
 .inv-summary {
     display: flex;
     flex-wrap: wrap;
@@ -610,16 +576,6 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     font-weight: bold;
     color: var(--sub-text);
 }
-.inv-item.selectable {
-    cursor: pointer;
-    box-shadow: 0 0 0 0 transparent;
-}
-.inv-item.selectable:hover {
-    border-color: var(--accent-color);
-    transform: translateX(2px);
-    box-shadow: 0 0 0 2px var(--accent-color);
-}
-
 /* ===== Pity result card ===== */
 .result-card.pity-card {
     border: 2px solid var(--gc, var(--accent-color));

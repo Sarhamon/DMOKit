@@ -21,6 +21,13 @@ const clearInvBtn = document.getElementById('clearInvBtn');
 
 const sortedFusions = [...fusions].sort((a, b) => gradeRank(b.inputGrade) - gradeRank(a.inputGrade));
 
+let currentMode = 'auto';
+
+function getActiveFusions() {
+    if (currentMode === 'auto') return sortedFusions;
+    return sortedFusions.filter(g => g.inputGrade === currentMode);
+}
+
 function gradeRank(g) {
     const i = GRADE_ORDER.indexOf(g);
     return i === -1 ? 999 : i;
@@ -76,33 +83,18 @@ function fuseOne(group, consumedNames) {
 }
 
 function updateFusionAvail() {
-    if (!fusionAvail) return;
     let totalPossible = 0;
-    let lowestGradeInfo = '';
-
-    for (const group of sortedFusions) {
+    for (const group of getActiveFusions()) {
         const avail = getByGrade(group.inputGrade).reduce((s, i) => s + i.count, 0);
-        const possible = Math.floor(avail / group.inputCount);
-        if (possible > 0) {
-            if (totalPossible === 0) {
-                lowestGradeInfo = `${group.inputGrade}등급 ${possible}회`;
-            }
-            totalPossible += possible;
-        }
+        totalPossible += Math.floor(avail / group.inputCount);
     }
-
-    if (totalPossible > 0) {
-        fusionAvail.textContent = `최하위 대기: ${lowestGradeInfo} / 총 ${totalPossible}회 합성 가능`;
-        if (fuse1Btn) {
-            fuse1Btn.disabled = false;
-            fuse1Btn.textContent = '1회 합성';
-        }
-    } else {
-        fusionAvail.textContent = '합성 가능한 아이템이 없습니다.';
-        if (fuse1Btn) {
-            fuse1Btn.disabled = true;
-            fuse1Btn.textContent = '1회 합성';
-        }
+    const enabled = totalPossible > 0;
+    if (fuse1Btn) fuse1Btn.disabled = !enabled;
+    if (fuseNBtn) fuseNBtn.disabled = !enabled;
+    if (fusionAvail) {
+        fusionAvail.textContent = enabled
+            ? `총 ${totalPossible}회 합성 가능`
+            : '합성 가능한 아이템이 없습니다.';
     }
 }
 
@@ -181,11 +173,12 @@ function renderResults(batches, requestedTickets, executedTickets) {
 function fuseAuto(tickets) {
     const batches = [];
     let executed = 0;
+    const activeFusions = getActiveFusions();
 
     for (let i = 0; i < tickets; i++) {
         let fusedThisRound = false;
 
-        for (const group of sortedFusions) {
+        for (const group of activeFusions) {
             const grade = group.inputGrade;
             const avail = getByGrade(grade).reduce((s, item) => s + item.count, 0);
 
@@ -229,6 +222,15 @@ if (fuse1Btn) fuse1Btn.addEventListener('click', () => fuseAuto(1));
 if (fuseNBtn) fuseNBtn.addEventListener('click', onFuseN);
 if (fuseNInput) fuseNInput.addEventListener('keydown', e => { if (e.key === 'Enter') onFuseN(); });
 if (clearInvBtn) clearInvBtn.addEventListener('click', onClearInventory);
+
+const modeButtons = document.querySelectorAll('.mode-btn');
+modeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentMode = btn.dataset.mode;
+        modeButtons.forEach(b => b.classList.toggle('active', b === btn));
+        updateFusionAvail();
+    });
+});
 
 const themeToggle = document.querySelector('.theme-toggle');
 if (themeToggle) themeToggle.addEventListener('click', toggleTheme);

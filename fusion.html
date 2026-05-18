@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="style.css">
     <meta property="og:title" content="DMOKit - 데이터 융합 시뮬레이터">
     <meta property="og:description" content="디지몬 마스터즈 데이터 융합 - 천장 시스템 포함">
+    <meta property="og:image" content="./dmo.png">
 </head>
 <body>
 
@@ -33,23 +34,15 @@
         <div class="fusion-controls">
             <div class="fusion-mode-toggle">
                 <button class="mode-btn active" data-mode="auto">자동</button>
-                <button class="mode-btn" data-mode="manual">수동</button>
+                <button class="mode-btn" data-mode="SSS">SSS</button>
+                <button class="mode-btn" data-mode="SSS+">SSS+</button>
             </div>
 
-            <div class="mode-pane" id="autoPane">
+            <div class="mode-pane">
                 <button class="calc-btn" id="fuse1Btn">1회 합성</button>
                 <div class="multi-pull">
                     <button class="calc-btn" id="fuseNBtn">N회 합성</button>
                     <input type="number" id="fuseNInput" min="1" max="10000" value="10">
-                </div>
-            </div>
-
-            <div class="mode-pane hidden" id="manualPane">
-                <div class="manual-hint" id="manualHint">아래 인벤토리에서 동일 등급 아이템 4개를 클릭하세요.</div>
-                <div class="manual-slots" id="manualSlots"></div>
-                <div class="manual-actions">
-                    <button class="calc-btn" id="fuseManualBtn" disabled>합성 (0/4)</button>
-                    <button class="calc-btn secondary" id="clearSelBtn">선택 초기화</button>
                 </div>
             </div>
 
