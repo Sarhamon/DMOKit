@@ -662,6 +662,33 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     box-shadow: 0 0 12px var(--gc, var(--accent-color));
 }
 
+/* ===== Upgrade marker ===== */
+.upgrade-tag {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    color: #b48400;
+    font-weight: 700;
+    background: rgba(252, 196, 25, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+html.dark-mode .upgrade-tag { color: #ffd43b; }
+
+.result-card.upgraded:not(.flip-card) {
+    border: 2px solid #fcc419;
+    box-shadow: 0 0 12px rgba(252, 196, 25, 0.6);
+}
+.result-card.flip-card.upgraded.revealed .flip-back {
+    border: 2px solid #fcc419;
+    box-shadow: 0 0 16px rgba(252, 196, 25, 0.7);
+    animation: upgrade-flash 0.7s ease-out;
+}
+@keyframes upgrade-flash {
+    0% { box-shadow: 0 0 0 rgba(252, 196, 25, 0); }
+    50% { box-shadow: 0 0 28px rgba(252, 196, 25, 1); }
+    100% { box-shadow: 0 0 16px rgba(252, 196, 25, 0.7); }
+}
+
 /* ===== Pity result card ===== */
 .result-card.pity-card:not(.flip-card) {
     border: 2px solid var(--gc, var(--accent-color));

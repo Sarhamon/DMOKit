@@ -2,6 +2,7 @@ import { loadTheme, toggleTheme } from '../theme.js';
 import { draws } from './drawData.js';
 import { addItems, getTotalCount, subscribe } from './inventory.js';
 import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
+import { maybeUpgrade } from './upgrade.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
@@ -94,9 +95,11 @@ function renderResults(items) {
     const parts = [];
     if (items.length > 1) parts.push(revealAllRowHTML());
     for (const it of items) {
+        const upTag = it._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
         const back = `<span class="r-grade">${escapeHtml(it.grade)}</span>
-            <span class="r-name">${escapeHtml(it.name)}</span>`;
-        parts.push(flipCardWrap(back, gradeClass(it.grade), '', { grade: escapeHtml(it.grade) }));
+            <span class="r-name">${escapeHtml(it.name)}</span>${upTag}`;
+        const extraClass = it._upgraded ? 'upgraded' : '';
+        parts.push(flipCardWrap(back, gradeClass(it.grade), extraClass, { grade: escapeHtml(it.grade) }));
     }
     resultGrid.innerHTML = parts.join('');
     setupFlip(resultGrid, onCardReveal);
@@ -115,10 +118,10 @@ function pull(tickets) {
     const totalItems = tickets * currentDraw.pullCount;
     const results = [];
     for (let i = 0; i < totalItems; i++) {
-        results.push(pullOne(currentDraw));
+        results.push(maybeUpgrade(pullOne(currentDraw)));
     }
     stats.tickets += tickets;
-    addItems(results);
+    addItems(results.map(r => ({ name: r.name, grade: r.grade })));
     renderStats();
     renderResults(results);
 }

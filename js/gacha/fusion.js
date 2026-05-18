@@ -5,6 +5,7 @@ import {
     getTotalCount, clearAll, getPity, incrementPity, resetPity, subscribe
 } from './inventory.js';
 import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
+import { maybeUpgrade } from './upgrade.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
@@ -69,14 +70,14 @@ function pickAutoConsume(grade, count) {
 
 function fuseOne(group, consumedNames) {
     consumeItems(consumedNames);
-    const result = pullOne(group.results);
-    addItems([result]);
+    const result = maybeUpgrade(pullOne(group.results));
+    addItems([{ name: result.name, grade: result.grade }]);
     let pityResult = null;
     if (group.pity) {
         const counter = incrementPity(group.name);
         if (counter >= group.pity.every) {
-            pityResult = pullOne(group.pity.results);
-            addItems([pityResult]);
+            pityResult = maybeUpgrade(pullOne(group.pity.results));
+            addItems([{ name: pityResult.name, grade: pityResult.grade }]);
             resetPity(group.name);
         }
     }
@@ -160,26 +161,34 @@ function renderResults(batches, requestedTickets, executedTickets) {
     if (flipMode && totalResults > 1) cards.push(revealAllRowHTML());
 
     for (const b of batches) {
+        const upTag = b.result._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
+        const pityUpTag = b.pityResult && b.pityResult._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
         if (flipMode) {
             const back = `<span class="r-grade">${escapeHtml(b.result.grade)}</span>
-                <span class="r-name">${escapeHtml(b.result.name)}</span>`;
-            cards.push(flipCardWrap(back, gradeClass(b.result.grade)));
+                <span class="r-name">${escapeHtml(b.result.name)}</span>${upTag}`;
+            const extra = b.result._upgraded ? 'upgraded' : '';
+            cards.push(flipCardWrap(back, gradeClass(b.result.grade), extra));
             if (b.pityResult) {
                 const pityBack = `<span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
                     <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
-                    <span class="pity-tag">천장 보너스</span>`;
-                cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), 'pity-card'));
+                    <span class="pity-tag">천장 보너스</span>${pityUpTag}`;
+                const pityExtra = 'pity-card' + (b.pityResult._upgraded ? ' upgraded' : '');
+                cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), pityExtra));
             }
         } else {
-            cards.push(`<div class="result-card ${gradeClass(b.result.grade)}">
+            const cls = `result-card ${gradeClass(b.result.grade)}${b.result._upgraded ? ' upgraded' : ''}`;
+            cards.push(`<div class="${cls}">
                 <span class="r-grade">${escapeHtml(b.result.grade)}</span>
                 <span class="r-name">${escapeHtml(b.result.name)}</span>
+                ${upTag}
             </div>`);
             if (b.pityResult) {
-                cards.push(`<div class="result-card pity-card ${gradeClass(b.pityResult.grade)}">
+                const pcls = `result-card pity-card ${gradeClass(b.pityResult.grade)}${b.pityResult._upgraded ? ' upgraded' : ''}`;
+                cards.push(`<div class="${pcls}">
                     <span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
                     <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
                     <span class="pity-tag">천장 보너스</span>
+                    ${pityUpTag}
                 </div>`);
             }
         }
