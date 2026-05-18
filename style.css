@@ -644,9 +644,29 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     font-weight: 700;
     color: var(--accent-color);
     opacity: 0.7;
+    display: inline-block;
 }
-.result-card.flip-card:not(.revealed):hover .flip-front,
-.result-card.flip-card:not(.revealed):focus .flip-front {
+.result-card.flip-card.spinning {
+    cursor: default;
+}
+.result-card.flip-card.spinning .flip-front {
+    border-left-color: var(--rank1-text);
+    box-shadow: 0 0 14px rgba(255, 135, 135, 0.4);
+}
+.result-card.flip-card.spinning .flip-front .flip-mark {
+    animation: flip-shake 80ms linear infinite;
+    color: var(--rank1-text);
+    opacity: 1;
+}
+@keyframes flip-shake {
+    0%   { transform: translateX(0) scale(1); }
+    25%  { transform: translateX(-4px) scale(1.15); }
+    50%  { transform: translateX(0) scale(0.9); }
+    75%  { transform: translateX(4px) scale(1.15); }
+    100% { transform: translateX(0) scale(1); }
+}
+.result-card.flip-card:not(.revealed):not(.spinning):hover .flip-front,
+.result-card.flip-card:not(.revealed):not(.spinning):focus .flip-front {
     transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.18);
     border-left-color: var(--rank1-text);

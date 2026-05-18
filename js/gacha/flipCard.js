@@ -14,11 +14,17 @@ export function revealAllRowHTML() {
     return `<div class="reveal-all-row"><button type="button" class="reveal-all-btn">전체 공개</button></div>`;
 }
 
+const SPIN_DURATION_MS = 1280;
+
 export function setupFlip(container, onReveal) {
     const reveal = card => {
-        if (card.classList.contains('revealed')) return;
-        card.classList.add('revealed');
-        if (onReveal) onReveal(card);
+        if (card.classList.contains('revealed') || card.classList.contains('spinning')) return;
+        card.classList.add('spinning');
+        setTimeout(() => {
+            card.classList.remove('spinning');
+            card.classList.add('revealed');
+            if (onReveal) onReveal(card);
+        }, SPIN_DURATION_MS);
     };
     container.querySelectorAll('.flip-card:not(.revealed)').forEach(card => {
         card.addEventListener('click', () => reveal(card));
@@ -32,7 +38,7 @@ export function setupFlip(container, onReveal) {
     const revealBtn = container.querySelector('.reveal-all-btn');
     if (revealBtn) {
         revealBtn.addEventListener('click', () => {
-            container.querySelectorAll('.flip-card:not(.revealed)').forEach((card, i) => {
+            container.querySelectorAll('.flip-card:not(.revealed):not(.spinning)').forEach((card, i) => {
                 setTimeout(() => reveal(card), i * 80);
             });
         });

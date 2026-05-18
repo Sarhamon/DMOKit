@@ -27,14 +27,20 @@ for (const group of fusions) {
     const pool = upperGroup
         ? upperGroup.results.filter(r => r.grade === upperGrade)
         : upper;
-    upgradeMap[G] = { rate, pool };
+    upgradeMap[G] = { rate, pool, upperGrade };
 }
 
-export function maybeUpgrade(item) {
+export function maybeUpgrade(item, scope) {
     const entry = upgradeMap[item.grade];
-    if (!entry) return { name: item.name, grade: item.grade, _upgraded: false };
-    if (Math.random() * 100 >= entry.rate) return { name: item.name, grade: item.grade, _upgraded: false };
-    const picked = pullWeighted(entry.pool);
+    const passthrough = { name: item.name, grade: item.grade, _upgraded: false };
+    if (!entry) return passthrough;
+    if (Math.random() * 100 >= entry.rate) return passthrough;
+    let pool = entry.pool;
+    if (scope) {
+        pool = scope.filter(r => r.grade === entry.upperGrade);
+        if (pool.length === 0) return passthrough;
+    }
+    const picked = pullWeighted(pool);
     return { name: picked.name, grade: picked.grade, _upgraded: true };
 }
 

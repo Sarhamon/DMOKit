@@ -118,7 +118,7 @@ function pull(tickets) {
     const totalItems = tickets * currentDraw.pullCount;
     const results = [];
     for (let i = 0; i < totalItems; i++) {
-        results.push(maybeUpgrade(pullOne(currentDraw)));
+        results.push(maybeUpgrade(pullOne(currentDraw), currentDraw.items));
     }
     stats.tickets += tickets;
     addItems(results.map(r => ({ name: r.name, grade: r.grade })));
