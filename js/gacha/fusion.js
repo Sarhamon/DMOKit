@@ -4,6 +4,7 @@ import {
     addItems, consumeItems, getAll, getByGrade, getCountByGrade,
     getTotalCount, clearAll, getPity, incrementPity, resetPity, subscribe
 } from './inventory.js';
+import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
@@ -153,21 +154,38 @@ function renderResults(batches, requestedTickets, executedTickets) {
     }
     fusionResultCount.textContent = suffix;
 
+    const flipMode = executedTickets === 1;
     const cards = [];
+
+    if (flipMode && totalResults > 1) cards.push(revealAllRowHTML());
+
     for (const b of batches) {
-        cards.push(`<div class="result-card ${gradeClass(b.result.grade)}">
-            <span class="r-grade">${escapeHtml(b.result.grade)}</span>
-            <span class="r-name">${escapeHtml(b.result.name)}</span>
-        </div>`);
-        if (b.pityResult) {
-            cards.push(`<div class="result-card pity-card ${gradeClass(b.pityResult.grade)}">
-                <span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
-                <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
-                <span class="pity-tag">천장 보너스</span>
+        if (flipMode) {
+            const back = `<span class="r-grade">${escapeHtml(b.result.grade)}</span>
+                <span class="r-name">${escapeHtml(b.result.name)}</span>`;
+            cards.push(flipCardWrap(back, gradeClass(b.result.grade)));
+            if (b.pityResult) {
+                const pityBack = `<span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
+                    <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
+                    <span class="pity-tag">천장 보너스</span>`;
+                cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), 'pity-card'));
+            }
+        } else {
+            cards.push(`<div class="result-card ${gradeClass(b.result.grade)}">
+                <span class="r-grade">${escapeHtml(b.result.grade)}</span>
+                <span class="r-name">${escapeHtml(b.result.name)}</span>
             </div>`);
+            if (b.pityResult) {
+                cards.push(`<div class="result-card pity-card ${gradeClass(b.pityResult.grade)}">
+                    <span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
+                    <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
+                    <span class="pity-tag">천장 보너스</span>
+                </div>`);
+            }
         }
     }
     fusionResultGrid.innerHTML = cards.length ? cards.join('') : '<div class="empty-msg">결과 없음</div>';
+    if (flipMode) setupFlip(fusionResultGrid);
 }
 
 function fuseAuto(tickets) {

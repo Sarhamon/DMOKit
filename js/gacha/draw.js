@@ -1,14 +1,13 @@
 import { loadTheme, toggleTheme } from '../theme.js';
 import { draws } from './drawData.js';
 import { addItems, getTotalCount, subscribe } from './inventory.js';
+import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
 const drawSelect = document.getElementById('drawSelect');
 const drawMeta = document.getElementById('drawMeta');
 const pull1Btn = document.getElementById('pull1Btn');
-const pullNBtn = document.getElementById('pullNBtn');
-const pullNInput = document.getElementById('pullNInput');
 const resetBtn = document.getElementById('resetBtn');
 const statTotal = document.getElementById('statTotal');
 const statGradeList = document.getElementById('statGradeList');
@@ -91,13 +90,23 @@ function renderResults(items) {
         resultGrid.innerHTML = '<div class="empty-msg">뽑기 버튼을 눌러주세요.</div>';
         return;
     }
-    const sorted = [...items].sort((a, b) => gradeRank(a.grade) - gradeRank(b.grade));
-    resultGrid.innerHTML = sorted.map(it => `
-        <div class="result-card ${gradeClass(it.grade)}">
-            <span class="r-grade">${escapeHtml(it.grade)}</span>
-            <span class="r-name">${escapeHtml(it.name)}</span>
-        </div>
-    `).join('');
+    const parts = [];
+    if (items.length > 1) parts.push(revealAllRowHTML());
+    for (const it of items) {
+        const back = `<span class="r-grade">${escapeHtml(it.grade)}</span>
+            <span class="r-name">${escapeHtml(it.name)}</span>`;
+        parts.push(flipCardWrap(back, gradeClass(it.grade), '', { grade: escapeHtml(it.grade) }));
+    }
+    resultGrid.innerHTML = parts.join('');
+    setupFlip(resultGrid, onCardReveal);
+}
+
+function onCardReveal(card) {
+    const grade = card.dataset.grade;
+    if (!grade) return;
+    stats.total++;
+    stats.byGrade[grade] = (stats.byGrade[grade] || 0) + 1;
+    renderStats();
 }
 
 function pull(tickets) {
@@ -105,10 +114,7 @@ function pull(tickets) {
     const totalItems = tickets * currentDraw.pullCount;
     const results = [];
     for (let i = 0; i < totalItems; i++) {
-        const item = pullOne(currentDraw);
-        results.push(item);
-        stats.total++;
-        stats.byGrade[item.grade] = (stats.byGrade[item.grade] || 0) + 1;
+        results.push(pullOne(currentDraw));
     }
     stats.tickets += tickets;
     addItems(results);
@@ -122,14 +128,6 @@ function onDrawChange() {
     resetStats();
 }
 
-function onPullN() {
-    let n = parseInt(pullNInput.value, 10);
-    if (isNaN(n) || n < 1) n = 1;
-    if (n > 10000) n = 10000;
-    pullNInput.value = n;
-    pull(n);
-}
-
 function updateInvCount() {
     const el = document.getElementById('invCount');
     if (el) el.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
@@ -137,8 +135,6 @@ function updateInvCount() {
 
 drawSelect.addEventListener('change', onDrawChange);
 pull1Btn.addEventListener('click', () => pull(1));
-pullNBtn.addEventListener('click', onPullN);
-pullNInput.addEventListener('keydown', e => { if (e.key === 'Enter') onPullN(); });
 resetBtn.addEventListener('click', resetStats);
 document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
 subscribe(updateInvCount);

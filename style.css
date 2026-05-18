@@ -576,8 +576,91 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     font-weight: bold;
     color: var(--sub-text);
 }
+/* ===== Card flip reveal (1회 모드) ===== */
+.reveal-all-row {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+}
+.reveal-all-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.reveal-all-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+
+.result-card.flip-card {
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+    border-left: none;
+    height: 90px;
+    perspective: 1000px;
+    cursor: pointer;
+    outline: none;
+}
+.result-card.flip-card:hover { transform: none; box-shadow: none; }
+.result-card.flip-card .flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.result-card.flip-card.revealed .flip-inner { transform: rotateY(180deg); }
+.result-card.flip-card .flip-front,
+.result-card.flip-card .flip-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    padding: 12px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.result-card.flip-card .flip-front {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-border) 100%);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--accent-color);
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.result-card.flip-card .flip-front .flip-mark {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    opacity: 0.7;
+}
+.result-card.flip-card:not(.revealed):hover .flip-front,
+.result-card.flip-card:not(.revealed):focus .flip-front {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    border-left-color: var(--rank1-text);
+}
+.result-card.flip-card .flip-back {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--gc, var(--card-border));
+    transform: rotateY(180deg);
+}
+.result-card.flip-card.pity-card.revealed .flip-back {
+    border: 2px solid var(--gc, var(--accent-color));
+    box-shadow: 0 0 12px var(--gc, var(--accent-color));
+}
+
 /* ===== Pity result card ===== */
-.result-card.pity-card {
+.result-card.pity-card:not(.flip-card) {
     border: 2px solid var(--gc, var(--accent-color));
     box-shadow: 0 0 12px var(--gc, var(--accent-color));
     position: relative;
