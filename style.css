@@ -396,6 +396,9 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
 }
+.result-grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .result-grid .empty-msg {
     grid-column: 1 / -1;
     text-align: center;

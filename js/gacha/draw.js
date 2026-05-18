@@ -86,6 +86,7 @@ function renderStats() {
 
 function renderResults(items) {
     resultCount.textContent = items.length ? `(${items.length}회)` : '';
+    resultGrid.classList.toggle('cols-3', items.length === 6);
     if (!items.length) {
         resultGrid.innerHTML = '<div class="empty-msg">뽑기 버튼을 눌러주세요.</div>';
         return;
