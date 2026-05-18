@@ -41,7 +41,12 @@ export function maybeUpgrade(item, scope) {
         if (pool.length === 0) return passthrough;
     }
     const picked = pullWeighted(pool);
-    return { name: picked.name, grade: picked.grade, _upgraded: true };
+    return {
+        name: picked.name,
+        grade: picked.grade,
+        _upgraded: true,
+        _orig: { name: item.name, grade: item.grade },
+    };
 }
 
 export function getUpgradeRate(grade) {

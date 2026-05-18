@@ -95,10 +95,24 @@ function renderResults(items) {
     const parts = [];
     if (items.length > 1) parts.push(revealAllRowHTML());
     for (const it of items) {
-        const upTag = it._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
-        const back = `<span class="r-grade">${escapeHtml(it.grade)}</span>
-            <span class="r-name">${escapeHtml(it.name)}</span>${upTag}`;
-        const extraClass = it._upgraded ? 'upgraded' : '';
+        let back;
+        let extraClass;
+        if (it._upgraded) {
+            back = `<div class="back-stage back-stage-original ${gradeClass(it._orig.grade)}">
+                <span class="r-grade">${escapeHtml(it._orig.grade)}</span>
+                <span class="r-name">${escapeHtml(it._orig.name)}</span>
+            </div>
+            <div class="back-stage back-stage-upgraded ${gradeClass(it.grade)}">
+                <span class="r-grade">${escapeHtml(it.grade)}</span>
+                <span class="r-name">${escapeHtml(it.name)}</span>
+                <span class="upgrade-tag">⬆ 등급업</span>
+            </div>`;
+            extraClass = 'upgraded';
+        } else {
+            back = `<span class="r-grade">${escapeHtml(it.grade)}</span>
+                <span class="r-name">${escapeHtml(it.name)}</span>`;
+            extraClass = '';
+        }
         parts.push(flipCardWrap(back, gradeClass(it.grade), extraClass, { grade: escapeHtml(it.grade) }));
     }
     resultGrid.innerHTML = parts.join('');

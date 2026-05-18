@@ -160,18 +160,31 @@ function renderResults(batches, requestedTickets, executedTickets) {
 
     if (flipMode && totalResults > 1) cards.push(revealAllRowHTML());
 
+    function buildFlipBack(it, gradeSuffix = '', extraHtml = '') {
+        if (!it._upgraded) {
+            return `<span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
+                <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}`;
+        }
+        return `<div class="back-stage back-stage-original ${gradeClass(it._orig.grade)}">
+            <span class="r-grade">${escapeHtml(it._orig.grade)}${gradeSuffix}</span>
+            <span class="r-name">${escapeHtml(it._orig.name)}</span>${extraHtml}
+        </div>
+        <div class="back-stage back-stage-upgraded ${gradeClass(it.grade)}">
+            <span class="r-grade">${escapeHtml(it.grade)}${gradeSuffix}</span>
+            <span class="r-name">${escapeHtml(it.name)}</span>${extraHtml}
+            <span class="upgrade-tag">⬆ 등급업</span>
+        </div>`;
+    }
+
     for (const b of batches) {
         const upTag = b.result._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
         const pityUpTag = b.pityResult && b.pityResult._upgraded ? '<span class="upgrade-tag">⬆ 등급업</span>' : '';
         if (flipMode) {
-            const back = `<span class="r-grade">${escapeHtml(b.result.grade)}</span>
-                <span class="r-name">${escapeHtml(b.result.name)}</span>${upTag}`;
+            const back = buildFlipBack(b.result);
             const extra = b.result._upgraded ? 'upgraded' : '';
             cards.push(flipCardWrap(back, gradeClass(b.result.grade), extra));
             if (b.pityResult) {
-                const pityBack = `<span class="r-grade">${escapeHtml(b.pityResult.grade)} ⭐</span>
-                    <span class="r-name">${escapeHtml(b.pityResult.name)}</span>
-                    <span class="pity-tag">천장 보너스</span>${pityUpTag}`;
+                const pityBack = buildFlipBack(b.pityResult, ' ⭐', '<span class="pity-tag">천장 보너스</span>');
                 const pityExtra = 'pity-card' + (b.pityResult._upgraded ? ' upgraded' : '');
                 cards.push(flipCardWrap(pityBack, gradeClass(b.pityResult.grade), pityExtra));
             }

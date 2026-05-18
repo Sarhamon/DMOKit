@@ -654,7 +654,7 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     box-shadow: 0 0 14px rgba(255, 135, 135, 0.4);
 }
 .result-card.flip-card.spinning .flip-front .flip-mark {
-    animation: flip-shake 80ms linear infinite;
+    animation: flip-shake 60ms linear infinite;
     color: var(--rank1-text);
     opacity: 1;
 }
@@ -698,15 +698,49 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     border: 2px solid #fcc419;
     box-shadow: 0 0 12px rgba(252, 196, 25, 0.6);
 }
-.result-card.flip-card.upgraded.revealed .flip-back {
+
+/* Two-stage back for upgrade reveal (flip mode) */
+.result-card.flip-card.upgraded .flip-back {
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+.result-card.flip-card.upgraded .flip-back .back-stage {
+    position: absolute;
+    inset: 0;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--gc, var(--card-border));
+    background-color: var(--card-bg);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.result-card.flip-card.upgraded .back-stage-upgraded { display: none; }
+.result-card.flip-card.upgraded.upgrade-shown .back-stage-original { display: none; }
+.result-card.flip-card.upgraded.upgrade-shown .back-stage-upgraded {
+    display: flex;
     border: 2px solid #fcc419;
     box-shadow: 0 0 16px rgba(252, 196, 25, 0.7);
-    animation: upgrade-flash 0.7s ease-out;
+    animation: upgrade-flash 0.6s ease-out;
 }
 @keyframes upgrade-flash {
     0% { box-shadow: 0 0 0 rgba(252, 196, 25, 0); }
     50% { box-shadow: 0 0 28px rgba(252, 196, 25, 1); }
     100% { box-shadow: 0 0 16px rgba(252, 196, 25, 0.7); }
+}
+
+/* Second flip animation for upgraded cards */
+@keyframes upgrade-flip {
+    0%   { transform: rotateY(180deg); }
+    50%  { transform: rotateY(360deg); }
+    100% { transform: rotateY(540deg); }
+}
+.result-card.flip-card.upgrading .flip-inner {
+    animation: upgrade-flip 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* ===== Pity result card ===== */

@@ -14,7 +14,19 @@ export function revealAllRowHTML() {
     return `<div class="reveal-all-row"><button type="button" class="reveal-all-btn">전체 공개</button></div>`;
 }
 
-const SPIN_DURATION_MS = 1280;
+const SPIN_DURATION_MS = 960;
+const UPGRADE_DELAY_MS = 800;
+const UPGRADE_FLIP_DURATION_MS = 1000;
+
+function triggerUpgradeFlip(card, onReveal) {
+    card.classList.add('upgrading');
+    setTimeout(() => {
+        card.classList.add('upgrade-shown');
+    }, UPGRADE_FLIP_DURATION_MS / 2);
+    setTimeout(() => {
+        if (onReveal) onReveal(card);
+    }, UPGRADE_FLIP_DURATION_MS);
+}
 
 export function setupFlip(container, onReveal) {
     const reveal = card => {
@@ -23,7 +35,11 @@ export function setupFlip(container, onReveal) {
         setTimeout(() => {
             card.classList.remove('spinning');
             card.classList.add('revealed');
-            if (onReveal) onReveal(card);
+            if (card.classList.contains('upgraded')) {
+                setTimeout(() => triggerUpgradeFlip(card, onReveal), UPGRADE_DELAY_MS);
+            } else if (onReveal) {
+                onReveal(card);
+            }
         }, SPIN_DURATION_MS);
     };
     container.querySelectorAll('.flip-card:not(.revealed)').forEach(card => {
