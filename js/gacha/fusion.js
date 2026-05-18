@@ -7,17 +7,10 @@ import {
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
-const fusionSelect = document.getElementById('fusionSelect');
 const fusionAvail = document.getElementById('fusionAvail');
 const fuse1Btn = document.getElementById('fuse1Btn');
 const fuseNBtn = document.getElementById('fuseNBtn');
 const fuseNInput = document.getElementById('fuseNInput');
-const autoPane = document.getElementById('autoPane');
-const manualPane = document.getElementById('manualPane');
-const manualSlots = document.getElementById('manualSlots');
-const manualHint = document.getElementById('manualHint');
-const fuseManualBtn = document.getElementById('fuseManualBtn');
-const clearSelBtn = document.getElementById('clearSelBtn');
 const pityDisplay = document.getElementById('pityDisplay');
 const fusionResultGrid = document.getElementById('fusionResultGrid');
 const fusionResultCount = document.getElementById('fusionResultCount');
@@ -25,17 +18,16 @@ const invCount = document.getElementById('invCount');
 const invSummary = document.getElementById('invSummary');
 const invGrid = document.getElementById('invGrid');
 const clearInvBtn = document.getElementById('clearInvBtn');
-const modeButtons = document.querySelectorAll('.mode-btn');
 
-let currentGroup = null;
-let mode = 'auto';
-let selectedSlots = [];
+const sortedFusions = [...fusions].sort((a, b) => gradeRank(b.inputGrade) - gradeRank(a.inputGrade));
 
 function gradeRank(g) {
     const i = GRADE_ORDER.indexOf(g);
     return i === -1 ? 999 : i;
 }
+
 function gradeClass(g) { return 'grade-' + g.replace('+', 'plus'); }
+
 function escapeHtml(s) {
     return s.replace(/[&<>"']/g, c => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -83,23 +75,39 @@ function fuseOne(group, consumedNames) {
     return { result, pityResult };
 }
 
-function populateFusionSelector() {
-    fusionSelect.innerHTML = fusions.map((g, i) =>
-        `<option value="${i}">${escapeHtml(g.name)} (${escapeHtml(g.inputGrade)}×${g.inputCount})</option>`
-    ).join('');
-}
-
 function updateFusionAvail() {
-    if (!currentGroup) { fusionAvail.textContent = '—'; return; }
-    const grade = currentGroup.inputGrade;
-    const avail = getByGrade(grade).reduce((s, i) => s + i.count, 0);
-    const maxFusions = Math.floor(avail / currentGroup.inputCount);
-    fusionAvail.textContent = `보유 ${grade}: ${avail}개 → 최대 ${maxFusions}회 합성 가능`;
-    fuse1Btn.disabled = maxFusions === 0;
-    fuse1Btn.textContent = `1회 합성 (${grade}×4)`;
+    if (!fusionAvail) return;
+    let totalPossible = 0;
+    let lowestGradeInfo = '';
+
+    for (const group of sortedFusions) {
+        const avail = getByGrade(group.inputGrade).reduce((s, i) => s + i.count, 0);
+        const possible = Math.floor(avail / group.inputCount);
+        if (possible > 0) {
+            if (totalPossible === 0) {
+                lowestGradeInfo = `${group.inputGrade}등급 ${possible}회`;
+            }
+            totalPossible += possible;
+        }
+    }
+
+    if (totalPossible > 0) {
+        fusionAvail.textContent = `최하위 대기: ${lowestGradeInfo} / 총 ${totalPossible}회 합성 가능`;
+        if (fuse1Btn) {
+            fuse1Btn.disabled = false;
+            fuse1Btn.textContent = '1회 합성';
+        }
+    } else {
+        fusionAvail.textContent = '합성 가능한 아이템이 없습니다.';
+        if (fuse1Btn) {
+            fuse1Btn.disabled = true;
+            fuse1Btn.textContent = '1회 합성';
+        }
+    }
 }
 
 function renderPity() {
+    if (!pityDisplay) return;
     const pityGroups = fusions.filter(g => g.pity);
     if (!pityGroups.length) { pityDisplay.innerHTML = ''; return; }
     pityDisplay.innerHTML = pityGroups.map(g => {
@@ -115,6 +123,7 @@ function renderPity() {
 }
 
 function renderInventory() {
+    if (!invCount || !invSummary || !invGrid) return;
     const all = getAll();
     invCount.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
     const counts = getCountByGrade();
@@ -132,10 +141,9 @@ function renderInventory() {
         if (r !== 0) return r;
         return a.name.localeCompare(b.name);
     });
-    const selectableGrade = mode === 'manual' && currentGroup ? currentGroup.inputGrade : null;
+    
     invGrid.innerHTML = sorted.map(it => {
-        const selectable = selectableGrade === it.grade;
-        const cls = `inv-item ${gradeClass(it.grade)}${selectable ? ' selectable' : ''}`;
+        const cls = `inv-item ${gradeClass(it.grade)}`;
         return `<div class="${cls}" data-name="${escapeHtml(it.name)}" data-grade="${escapeHtml(it.grade)}">
             <span class="inv-grade">${escapeHtml(it.grade)}</span>
             <span class="inv-name">${escapeHtml(it.name)}</span>
@@ -145,6 +153,7 @@ function renderInventory() {
 }
 
 function renderResults(batches, requestedTickets, executedTickets) {
+    if (!fusionResultCount || !fusionResultGrid) return;
     const totalResults = batches.reduce((s, b) => s + 1 + (b.pityResult ? 1 : 0), 0);
     let suffix = `(${executedTickets}회 합성, ${totalResults}개 획득)`;
     if (requestedTickets > executedTickets) {
@@ -170,88 +179,40 @@ function renderResults(batches, requestedTickets, executedTickets) {
 }
 
 function fuseAuto(tickets) {
-    if (!currentGroup) return;
-    const grade = currentGroup.inputGrade;
-    const avail = getByGrade(grade).reduce((s, i) => s + i.count, 0);
-    const maxFusions = Math.floor(avail / currentGroup.inputCount);
-    const actual = Math.min(tickets, maxFusions);
-    if (actual === 0) {
-        alert(`${grade} 등급 아이템이 ${currentGroup.inputCount}개 미만입니다.`);
+    const batches = [];
+    let executed = 0;
+
+    for (let i = 0; i < tickets; i++) {
+        let fusedThisRound = false;
+
+        for (const group of sortedFusions) {
+            const grade = group.inputGrade;
+            const avail = getByGrade(grade).reduce((s, item) => s + item.count, 0);
+
+            if (avail >= group.inputCount) {
+                const consumed = pickAutoConsume(grade, group.inputCount);
+                const fusion = fuseOne(group, consumed);
+                batches.push(fusion);
+                executed++;
+                fusedThisRound = true;
+                break;
+            }
+        }
+
+        if (!fusedThisRound) break;
+    }
+
+    if (executed === 0) {
+        alert('합성 가능한 아이템이 부족합니다.');
         return;
     }
-    const batches = [];
-    for (let i = 0; i < actual; i++) {
-        const consumed = pickAutoConsume(grade, currentGroup.inputCount);
-        const fusion = fuseOne(currentGroup, consumed);
-        batches.push(fusion);
-    }
-    renderResults(batches, tickets, actual);
-}
 
-function fuseManual() {
-    if (!currentGroup || selectedSlots.length !== currentGroup.inputCount) return;
-    const consumed = [...selectedSlots];
-    const fusion = fuseOne(currentGroup, consumed);
-    selectedSlots = [];
-    renderManualSlots();
-    renderResults([fusion], 1, 1);
-}
-
-function renderManualSlots() {
-    const cnt = currentGroup ? currentGroup.inputCount : 4;
-    const grade = currentGroup ? currentGroup.inputGrade : '';
-    const slots = [];
-    for (let i = 0; i < cnt; i++) {
-        const name = selectedSlots[i];
-        slots.push(name
-            ? `<div class="manual-slot filled" data-idx="${i}"><span class="r-name">${escapeHtml(name)}</span><span class="slot-remove">×</span></div>`
-            : `<div class="manual-slot empty">${escapeHtml(grade)} 슬롯 ${i + 1}</div>`
-        );
-    }
-    manualSlots.innerHTML = slots.join('');
-    fuseManualBtn.disabled = selectedSlots.length !== cnt;
-    fuseManualBtn.textContent = `합성 (${selectedSlots.length}/${cnt})`;
-    manualHint.textContent = `아래 인벤토리에서 ${grade} 등급 아이템 ${cnt}개를 클릭하세요.`;
-}
-
-function onSelectItem(name, grade) {
-    if (mode !== 'manual' || !currentGroup) return;
-    if (grade !== currentGroup.inputGrade) return;
-    if (selectedSlots.length >= currentGroup.inputCount) return;
-    // Check we still have inventory count (subtract already-selected occurrences)
-    const all = getAll();
-    const inv = all.find(it => it.name === name);
-    if (!inv) return;
-    const alreadySelected = selectedSlots.filter(n => n === name).length;
-    if (inv.count - alreadySelected <= 0) return;
-    selectedSlots.push(name);
-    renderManualSlots();
-}
-
-function onUnselectSlot(idx) {
-    selectedSlots.splice(idx, 1);
-    renderManualSlots();
-}
-
-function onGroupChange() {
-    currentGroup = fusions[parseInt(fusionSelect.value, 10)];
-    selectedSlots = [];
+    renderResults(batches, tickets, executed);
     updateFusionAvail();
-    renderManualSlots();
-    renderInventory();
-}
-
-function onModeChange(newMode) {
-    mode = newMode;
-    modeButtons.forEach(b => b.classList.toggle('active', b.dataset.mode === newMode));
-    autoPane.classList.toggle('hidden', newMode !== 'auto');
-    manualPane.classList.toggle('hidden', newMode !== 'manual');
-    if (newMode === 'manual') renderManualSlots();
-    selectedSlots = [];
-    renderInventory();
 }
 
 function onFuseN() {
+    if (!fuseNInput) return;
     let n = parseInt(fuseNInput.value, 10);
     if (isNaN(n) || n < 1) n = 1;
     if (n > 10000) n = 10000;
@@ -262,33 +223,15 @@ function onFuseN() {
 function onClearInventory() {
     if (!confirm('인벤토리와 천장 카운터를 모두 초기화합니다. 계속하시겠습니까?')) return;
     clearAll();
-    selectedSlots = [];
-    renderManualSlots();
 }
 
-// Event wiring
-fusionSelect.addEventListener('change', onGroupChange);
-modeButtons.forEach(b => b.addEventListener('click', () => onModeChange(b.dataset.mode)));
-fuse1Btn.addEventListener('click', () => fuseAuto(1));
-fuseNBtn.addEventListener('click', onFuseN);
-fuseNInput.addEventListener('keydown', e => { if (e.key === 'Enter') onFuseN(); });
-fuseManualBtn.addEventListener('click', fuseManual);
-clearSelBtn.addEventListener('click', () => { selectedSlots = []; renderManualSlots(); });
-clearInvBtn.addEventListener('click', onClearInventory);
+if (fuse1Btn) fuse1Btn.addEventListener('click', () => fuseAuto(1));
+if (fuseNBtn) fuseNBtn.addEventListener('click', onFuseN);
+if (fuseNInput) fuseNInput.addEventListener('keydown', e => { if (e.key === 'Enter') onFuseN(); });
+if (clearInvBtn) clearInvBtn.addEventListener('click', onClearInventory);
 
-invGrid.addEventListener('click', e => {
-    const el = e.target.closest('.inv-item');
-    if (!el || !el.classList.contains('selectable')) return;
-    onSelectItem(el.dataset.name, el.dataset.grade);
-});
-
-manualSlots.addEventListener('click', e => {
-    const el = e.target.closest('.manual-slot.filled');
-    if (!el) return;
-    onUnselectSlot(parseInt(el.dataset.idx, 10));
-});
-
-document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
+const themeToggle = document.querySelector('.theme-toggle');
+if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 
 subscribe(() => {
     updateFusionAvail();
@@ -297,7 +240,6 @@ subscribe(() => {
 });
 
 loadTheme();
-populateFusionSelector();
-onGroupChange();
+updateFusionAvail();
 renderPity();
 renderInventory();
