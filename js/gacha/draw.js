@@ -138,7 +138,7 @@ function pull(tickets) {
     }
     stats.tickets += tickets;
     stats.total += totalItems;
-    addItems(results.map(r => ({ name: r.name, grade: r.grade })));
+    addItems(results.map(r => ({ name: r.name, grade: r.grade, category: 'evolution' })));
     renderStats();
     renderResults(results);
 }

@@ -37,8 +37,14 @@ export function addItems(items) {
         const existing = state.items[it.name];
         if (existing) {
             existing.count++;
+            if (!existing.category && it.category) existing.category = it.category;
         } else {
-            state.items[it.name] = { name: it.name, grade: it.grade, count: 1 };
+            state.items[it.name] = {
+                name: it.name,
+                grade: it.grade,
+                category: it.category || 'evolution',
+                count: 1,
+            };
         }
     }
     notify();
@@ -56,24 +62,26 @@ export function consumeItems(names) {
     notify();
 }
 
-export function getAll() {
-    return Object.values(state.items);
+export function getAll(category = null) {
+    const items = Object.values(state.items);
+    if (category === null) return items;
+    return items.filter(it => (it.category || 'evolution') === category);
 }
 
-export function getByGrade(grade) {
-    return getAll().filter(it => it.grade === grade);
+export function getByGrade(grade, category = null) {
+    return getAll(category).filter(it => it.grade === grade);
 }
 
-export function getCountByGrade() {
+export function getCountByGrade(category = null) {
     const counts = {};
-    for (const it of getAll()) {
+    for (const it of getAll(category)) {
         counts[it.grade] = (counts[it.grade] || 0) + it.count;
     }
     return counts;
 }
 
-export function getTotalCount() {
-    return getAll().reduce((s, it) => s + it.count, 0);
+export function getTotalCount(category = null) {
+    return getAll(category).reduce((s, it) => s + it.count, 0);
 }
 
 export function clearAll() {

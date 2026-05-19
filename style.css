@@ -521,6 +521,23 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
 .pity-num { font-size: 0.85rem; color: var(--sub-text); font-family: monospace; min-width: 50px; text-align: right; }
 
 /* ===== Inventory display ===== */
+.inv-section { margin-bottom: 20px; }
+.inv-section:last-child { margin-bottom: 0; }
+.inv-section-title {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.inv-section-count {
+    font-size: 0.85rem;
+    color: var(--sub-text);
+    font-weight: normal;
+}
 .inv-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .inv-header .section-title { margin: 0; }
 .inv-header .calc-btn {

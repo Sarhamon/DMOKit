@@ -16,9 +16,23 @@ const pityDisplay = document.getElementById('pityDisplay');
 const fusionResultGrid = document.getElementById('fusionResultGrid');
 const fusionResultCount = document.getElementById('fusionResultCount');
 const invCount = document.getElementById('invCount');
-const invSummary = document.getElementById('invSummary');
-const invGrid = document.getElementById('invGrid');
 const clearInvBtn = document.getElementById('clearInvBtn');
+const invSections = [
+    {
+        category: 'evolution',
+        countEl: document.getElementById('invEvolutionCount'),
+        summaryEl: document.getElementById('invEvolutionSummary'),
+        gridEl: document.getElementById('invEvolutionGrid'),
+        emptyMsg: '드로우/융합 결과가 이곳에 쌓입니다.',
+    },
+    {
+        category: 'other',
+        countEl: document.getElementById('invOtherCount'),
+        summaryEl: document.getElementById('invOtherSummary'),
+        gridEl: document.getElementById('invOtherGrid'),
+        emptyMsg: '데이터 소환 결과가 이곳에 쌓입니다.',
+    },
+];
 
 const sortedFusions = [...fusions].sort((a, b) => gradeRank(b.inputGrade) - gradeRank(a.inputGrade));
 
@@ -54,7 +68,7 @@ function pullOne(items) {
 }
 
 function pickAutoConsume(grade, count) {
-    const itemsCopy = getByGrade(grade).map(it => ({ ...it }))
+    const itemsCopy = getByGrade(grade, 'evolution').map(it => ({ ...it }))
         .sort((a, b) => b.count - a.count);
     const picked = [];
     for (const item of itemsCopy) {
@@ -70,13 +84,13 @@ function pickAutoConsume(grade, count) {
 function fuseOne(group, consumedNames) {
     consumeItems(consumedNames);
     const result = maybeUpgrade(pullOne(group.results), group.results);
-    addItems([{ name: result.name, grade: result.grade }]);
+    addItems([{ name: result.name, grade: result.grade, category: 'evolution' }]);
     let pityResult = null;
     if (group.pity) {
         const counter = incrementPity(group.name);
         if (counter >= group.pity.every) {
             pityResult = maybeUpgrade(pullOne(group.pity.results), group.pity.results);
-            addItems([{ name: pityResult.name, grade: pityResult.grade }]);
+            addItems([{ name: pityResult.name, grade: pityResult.grade, category: 'evolution' }]);
             resetPity(group.name);
         }
     }
@@ -86,7 +100,7 @@ function fuseOne(group, consumedNames) {
 function updateFusionAvail() {
     let totalPossible = 0;
     for (const group of getActiveFusions()) {
-        const avail = getByGrade(group.inputGrade).reduce((s, i) => s + i.count, 0);
+        const avail = getByGrade(group.inputGrade, 'evolution').reduce((s, i) => s + i.count, 0);
         totalPossible += Math.floor(avail / group.inputCount);
     }
     const enabled = totalPossible > 0;
@@ -114,27 +128,29 @@ function renderPity() {
     }).join('');
 }
 
-function renderInventory() {
-    if (!invCount || !invSummary || !invGrid) return;
-    const all = getAll();
-    invCount.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
-    const counts = getCountByGrade();
+function renderInventorySection({ category, countEl, summaryEl, gridEl, emptyMsg }) {
+    if (!summaryEl || !gridEl) return;
+    const items = getAll(category);
+    const total = items.reduce((s, it) => s + it.count, 0);
+    if (countEl) countEl.textContent = total > 0 ? `(${total.toLocaleString()}개)` : '';
+
+    const counts = getCountByGrade(category);
     const grades = Object.keys(counts).sort((a, b) => gradeRank(a) - gradeRank(b));
-    invSummary.innerHTML = grades.length
+    summaryEl.innerHTML = grades.length
         ? grades.map(g => `<span class="stat-grade ${gradeClass(g)}"><span class="g-label">${escapeHtml(g)}</span><span class="g-count">${counts[g]}</span></span>`).join('')
         : '<span class="empty-msg-inline">아이템 없음</span>';
 
-    if (!all.length) {
-        invGrid.innerHTML = '<div class="empty-msg">드로우 결과가 이곳에 쌓입니다.</div>';
+    if (!items.length) {
+        gridEl.innerHTML = `<div class="empty-msg">${emptyMsg}</div>`;
         return;
     }
-    const sorted = [...all].sort((a, b) => {
+    const sorted = [...items].sort((a, b) => {
         const r = gradeRank(a.grade) - gradeRank(b.grade);
         if (r !== 0) return r;
         return a.name.localeCompare(b.name);
     });
-    
-    invGrid.innerHTML = sorted.map(it => {
+
+    gridEl.innerHTML = sorted.map(it => {
         const cls = `inv-item ${gradeClass(it.grade)}`;
         return `<div class="${cls}" data-name="${escapeHtml(it.name)}" data-grade="${escapeHtml(it.grade)}">
             <span class="inv-grade">${escapeHtml(it.grade)}</span>
@@ -142,6 +158,11 @@ function renderInventory() {
             <span class="inv-num">×${it.count}</span>
         </div>`;
     }).join('');
+}
+
+function renderInventory() {
+    if (invCount) invCount.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
+    for (const section of invSections) renderInventorySection(section);
 }
 
 function buildFlipBack(it, gradeSuffix = '', extraHtml = '') {
@@ -196,7 +217,7 @@ function fuseAuto(tickets) {
 
         for (const group of activeFusions) {
             const grade = group.inputGrade;
-            const avail = getByGrade(grade).reduce((s, item) => s + item.count, 0);
+            const avail = getByGrade(grade, 'evolution').reduce((s, item) => s + item.count, 0);
 
             if (avail >= group.inputCount) {
                 const consumed = pickAutoConsume(grade, group.inputCount);
