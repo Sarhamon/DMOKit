@@ -7,10 +7,10 @@ export const summons = [
         name: "퀀텀몬 데이터 소환 (100회 천장)",
         pity: {
             every: 100,
-            reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체][지급용]", grade: "U", category: "evolution" },
+            reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체][지급용]", grade: "U", category: "other" },
         },
         items: [
-            { probability: 0.05, name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "evolution" },
+            { probability: 0.05, name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "other" },
             { probability: 0.05, name: "봉인된 얼티밋 크로스로더", grade: "U", category: "other" },
             { probability: 0.45, name: "제로 유니트 악세서리 랜덤 상자", grade: "SSS+", category: "other" },
             { probability: 0.45, name: "봉인된 디지털 해저드 악세서리 세트 상자", grade: "SSS+", category: "other" },
@@ -42,10 +42,10 @@ export const summons = [
         name: "퀀텀몬 데이터 소환 (150회 천장)",
         pity: {
             every: 150,
-            reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "evolution" },
+            reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "other" },
         },
         items: [
-            { probability: 0.05, name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "evolution" },
+            { probability: 0.05, name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "other" },
             { probability: 0.05, name: "봉인된 얼티밋 크로스로더", grade: "U", category: "other" },
             { probability: 0.45, name: "제로 유니트 악세서리 랜덤 상자", grade: "SSS+", category: "other" },
             { probability: 0.45, name: "봉인된 디지털 해저드 악세서리 세트 상자", grade: "SSS+", category: "other" },
