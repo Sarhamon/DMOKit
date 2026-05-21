@@ -782,3 +782,64 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     font-weight: bold;
     border-top: 2px solid var(--accent-color);
 }
+
+/* ===== Rates view ===== */
+.rate-tabs {
+    display: inline-flex;
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.rate-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.rate-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--gc, var(--card-border));
+    font-size: 0.92rem;
+    transition: 0.15s;
+}
+.rate-row:hover { background-color: var(--locked-bg); }
+.rate-row .rate-grade {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--gc, var(--badge-bg));
+    color: white;
+    text-align: center;
+    justify-self: start;
+}
+.rate-row .rate-name {
+    font-weight: 600;
+    color: var(--text-color);
+    word-break: keep-all;
+}
+.rate-row .rate-prob {
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--text-color);
+    min-width: 70px;
+    text-align: right;
+}
+.rate-pity-header {
+    margin-top: 14px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    background: var(--runs-badge-bg);
+    border-radius: 8px;
+}
+.rate-pity-row .rate-prob { color: var(--accent-color); }
