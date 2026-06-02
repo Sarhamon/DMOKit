@@ -329,6 +329,16 @@ tr:last-child td { border-bottom: none; }
     padding-top: 16px;
     border-top: 1px solid var(--card-border);
 }
+#drawPicker {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+#drawPicker .buff-toggle { justify-content: flex-start; text-align: left; }
+#drawPicker .buff-toggle-name { flex: none; }
+@media (max-width: 600px) {
+    #drawPicker { grid-template-columns: repeat(2, 1fr); }
+}
 .draw-meta {
     font-size: 0.85rem;
     color: var(--sub-text);

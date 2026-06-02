@@ -3,27 +3,6 @@
 
 export const draws = [
     {
-        name: "탐험 디지털 드로우",
-        pullCount: 6,
-        items: [
-            { probability: 10.0, name: "신의 의지 [지급용]", grade: "SS" },
-            { probability: 10.0, name: "자이언트 미사일 [지급용]", grade: "SS" },
-            { probability: 10.0, name: "기사도 정신 [지급용]", grade: "SS" },
-            { probability: 10.0, name: "석장 [지급용]", grade: "SS" },
-            { probability: 10.0, name: "전설의 진화 - Ω [지급용]", grade: "SS" },
-            { probability: 10.0, name: "궁그닐 [지급용]", grade: "SS" },
-            { probability: 10.0, name: "게헤나 [지급용]", grade: "SS" },
-            { probability: 4.0, name: "바그라몬의 이상과 신념 [지급용]", grade: "SS+" },
-            { probability: 4.0, name: "실비아 [지급용]", grade: "SS+" },
-            { probability: 4.0, name: "홀리링[지급용]", grade: "SS+" },
-            { probability: 4.0, name: "펜리르", grade: "SS+" },
-            { probability: 4.0, name: "라플레시몬 : Data Core - 로제몬", grade: "SS+" },
-            { probability: 4.0, name: "능천사의 힘 - B", grade: "SS+" },
-            { probability: 4.0, name: "블록조각", grade: "SS+" },
-            { probability: 2.0, name: "힘의 응축체", grade: "SSS" },
-        ],
-    },
-    {
         name: "슬픔과 결의 디지털 드로우",
         pullCount: 6,
         items: [

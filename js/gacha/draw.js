@@ -49,7 +49,7 @@ function populatePicker() {
     picker.innerHTML = draws.map((d, i) =>
         `<label class="buff-toggle">
             <input type="radio" name="draw-pick" value="${i}" class="buff-check">
-            <span class="buff-toggle-name">${escapeHtml(d.name)}</span>
+            <span class="buff-toggle-name">${escapeHtml(d.name).replace('디지털 드로우', '<br>디지털 드로우')}</span>
         </label>`
     ).join('');
     picker.querySelectorAll('input').forEach(radio => {
