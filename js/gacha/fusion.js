@@ -15,6 +15,7 @@ const fuse10Btn = document.getElementById('fuse10Btn');
 const pityDisplay = document.getElementById('pityDisplay');
 const fusionResultGrid = document.getElementById('fusionResultGrid');
 const fusionResultCount = document.getElementById('fusionResultCount');
+const autoRevealCheck = document.getElementById('autoRevealCheck');
 const invCount = document.getElementById('invCount');
 const clearInvBtn = document.getElementById('clearInvBtn');
 const invSections = [
@@ -205,6 +206,11 @@ function renderResults(batches, requestedTickets, executedTickets) {
     }
     fusionResultGrid.innerHTML = cards.length ? cards.join('') : '<div class="empty-msg">결과 없음</div>';
     setupFlip(fusionResultGrid);
+    if (autoRevealCheck?.checked) {
+        const btn = fusionResultGrid.querySelector('.reveal-all-btn');
+        if (btn) btn.click();
+        else fusionResultGrid.querySelector('.flip-card:not(.revealed)')?.click();
+    }
 }
 
 function fuseAuto(tickets) {
