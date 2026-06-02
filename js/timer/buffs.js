@@ -14,7 +14,7 @@ export const BUFF_GROUPS = [
     },
     {
         buffs: [
-            { id: 'spicy', name: '매운 고추', duration: 1800 },
+            { id: 'spicy', name: '매운 고추', duration: 1800, cooldown: 3600 },
         ],
     },
 ];

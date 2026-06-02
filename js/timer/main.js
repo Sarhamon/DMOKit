@@ -10,9 +10,22 @@ loadTheme();
 let timers = [];
 let rafId  = null;
 
-function remaining(t) {
-    if (t.running) return Math.max(0, t.duration - t.elapsed - (Date.now() - t.startTime) / 1000);
-    return Math.max(0, t.duration - t.elapsed);
+function elapsed(t) {
+    return t.elapsed + (t.running ? (Date.now() - t.startTime) / 1000 : 0);
+}
+
+// Full timeline: buff duration, then (if any) the item reuse cooldown.
+function total(t) {
+    return t.cooldown || t.duration;
+}
+
+// Current display segment — buff while active, then "재사용 대기" until reusable.
+function view(t) {
+    const e = elapsed(t);
+    if (t.cooldown && e >= t.duration) {
+        return { name: `${t.name} · 재사용 대기`, remaining: Math.max(0, t.cooldown - e), segDuration: t.cooldown - t.duration, phase: 'cooldown' };
+    }
+    return { name: t.name, remaining: Math.max(0, t.duration - e), segDuration: t.duration, phase: 'buff' };
 }
 
 function fmtDuration(secs) {
@@ -24,7 +37,7 @@ function fmtDuration(secs) {
 // ── Timer actions ──────────────────────────────────────────────────────────────
 
 function addTimerForBuff(def) {
-    const t = { id: def.id, name: def.name, duration: def.duration, elapsed: 0, startTime: null, running: false, done: false };
+    const t = { id: def.id, name: def.name, duration: def.duration, cooldown: def.cooldown || 0, elapsed: 0, startTime: null, running: false, done: false };
     timers.push(t);
     renderCard(t);
     if (!rafId) rafId = requestAnimationFrame(tick);
@@ -106,19 +119,23 @@ function refresh(t) {
     const card = document.getElementById(`tc-${t.id}`);
     if (!card) return;
 
-    const rem = remaining(t);
-    const pct = t.duration > 0 ? rem / t.duration : 0;
-
-    if (t.running && rem <= 0) {
-        t.elapsed = t.duration; t.startTime = null; t.running = false; t.done = true;
+    if (t.running && elapsed(t) >= total(t)) {
+        t.elapsed = total(t); t.startTime = null; t.running = false; t.done = true;
         card.classList.add('timer-just-done');
         card.addEventListener('animationend', () => card.classList.remove('timer-just-done'), { once: true });
     }
+
+    const v   = view(t);
+    const rem = v.remaining;
+    const pct = v.segDuration > 0 ? rem / v.segDuration : 0;
 
     // Countdown text
     const displayEl = card.querySelector('.timer-display');
     displayEl.textContent = fmtCountdown(rem);
     displayEl.classList.toggle('has-hours', rem >= 3600);
+
+    // Name reflects the current phase (buff → 재사용 대기)
+    card.querySelector('.timer-ring-name').textContent = v.name;
 
     // Ring fill
     const ringFill = card.querySelector('.timer-ring-fill');
@@ -128,7 +145,8 @@ function refresh(t) {
         ringFill.classList.add('ring-done');
     } else if (t.running) {
         ringFill.classList.remove('ring-done');
-        ringFill.style.stroke = pct > 0.5 ? '#3fb950' : pct > 0.25 ? '#d29922' : '#f85149';
+        ringFill.style.stroke = v.phase === 'cooldown' ? '#58a6ff'
+            : pct > 0.5 ? '#3fb950' : pct > 0.25 ? '#d29922' : '#f85149';
     } else {
         ringFill.classList.remove('ring-done');
         ringFill.style.stroke = '';
@@ -206,10 +224,10 @@ if (!isPiPSupported()) {
         if (isActive()) { exitPiP(); return; }
         pipBtn.disabled = true;
         try {
-            await enterPiP(() => timers.map(t => ({
-                id: t.id, name: t.name, duration: t.duration,
-                remaining: remaining(t), running: t.running, done: t.done,
-            })));
+            await enterPiP(() => timers.map(t => {
+                const v = view(t);
+                return { id: t.id, name: v.name, duration: v.segDuration, remaining: v.remaining, running: t.running, done: t.done };
+            }));
         } catch (e) {
             console.error('PiP 오류:', e);
         } finally {
