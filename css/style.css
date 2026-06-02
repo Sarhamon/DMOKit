@@ -912,8 +912,7 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     min-width: 140px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     padding: 11px 14px;
     border: 2px solid var(--card-border);
     border-radius: 10px;
@@ -921,14 +920,23 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     color: var(--text-color);
     cursor: pointer;
     transition: 0.2s;
-    text-align: left;
+    user-select: none;
 }
 .buff-toggle:hover { border-color: var(--accent-color); }
-.buff-toggle.selected {
+.buff-toggle:has(input:checked) {
     border-color: var(--accent-color);
     background: var(--runs-badge-bg);
 }
-.buff-toggle-name { font-weight: 600; font-size: 0.95rem; }
+.buff-toggle input[type="checkbox"],
+.buff-toggle input[type="radio"] {
+    accent-color: var(--accent-color);
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.buff-toggle-name { font-weight: 600; font-size: 0.95rem; flex: 1; }
 .buff-toggle-dur {
     font-family: monospace;
     font-size: 0.82rem;
@@ -939,7 +947,7 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     white-space: nowrap;
     flex-shrink: 0;
 }
-.buff-toggle.selected .buff-toggle-dur {
+.buff-toggle:has(input:checked) .buff-toggle-dur {
     background: var(--runs-badge-bg);
     color: var(--runs-badge-text);
 }

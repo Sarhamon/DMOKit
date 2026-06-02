@@ -120,28 +120,9 @@ function refresh(t) {
 
 // ── Buff picker ────────────────────────────────────────────────────────────────
 
-function toggleBuff(id, group) {
-    const exists = timers.some(t => t.id === id);
-    if (exists) {
-        removeTimer(id);
-        document.getElementById(`bt-${id}`)?.classList.remove('selected');
-    } else {
-        if (group?.exclusive) {
-            group.buffs.forEach(b => {
-                if (b.id !== id) {
-                    removeTimer(b.id);
-                    document.getElementById(`bt-${b.id}`)?.classList.remove('selected');
-                }
-            });
-        }
-        addTimerForBuff(BUFF_BY_ID[id]);
-        document.getElementById(`bt-${id}`)?.classList.add('selected');
-    }
-}
-
 function initBuffPicker() {
     const body = document.getElementById('buff-picker-body');
-    BUFF_GROUPS.forEach(group => {
+    BUFF_GROUPS.forEach((group, gi) => {
         const row = document.createElement('div');
         row.className = 'buff-group-row';
 
@@ -155,12 +136,25 @@ function initBuffPicker() {
         const btns = document.createElement('div');
         btns.className = 'buff-group-buttons';
         group.buffs.forEach(def => {
-            const btn = document.createElement('button');
-            btn.id = `bt-${def.id}`;
-            btn.className = 'buff-toggle';
-            btn.innerHTML = `<span class="buff-toggle-name">${def.name}</span><span class="buff-toggle-dur">${fmtDuration(def.duration)}</span>`;
-            btn.addEventListener('click', () => toggleBuff(def.id, group));
-            btns.appendChild(btn);
+            const label = document.createElement('label');
+            label.className = 'buff-toggle';
+
+            const input = document.createElement('input');
+            input.type      = group.exclusive ? 'radio' : 'checkbox';
+            input.value     = def.id;
+            input.className = 'buff-check';
+            if (group.exclusive) input.name = `excl-${gi}`;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className   = 'buff-toggle-name';
+            nameSpan.textContent = def.name;
+
+            const durSpan = document.createElement('span');
+            durSpan.className   = 'buff-toggle-dur';
+            durSpan.textContent = fmtDuration(def.duration);
+
+            label.append(input, nameSpan, durSpan);
+            btns.appendChild(label);
         });
 
         row.appendChild(btns);
@@ -198,7 +192,18 @@ if (!isPiPSupported()) {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 document.getElementById('start-all-btn').addEventListener('click', () => {
-    timers.forEach(t => { if (!t.running && !t.done) startTimer(t); });
+    document.querySelectorAll('.buff-check:checked').forEach(input => {
+        const def = BUFF_BY_ID[input.value];
+        if (!def) return;
+        let t = timers.find(t => t.id === def.id);
+        if (!t) {
+            addTimerForBuff(def);
+            t = timers.find(t => t.id === def.id);
+        } else if (t.done) {
+            resetTimer(t);
+        }
+        if (t && !t.running) startTimer(t);
+    });
 });
 
 initBuffPicker();
