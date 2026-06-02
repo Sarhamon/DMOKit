@@ -143,7 +143,14 @@ function initBuffPicker() {
             input.type      = group.exclusive ? 'radio' : 'checkbox';
             input.value     = def.id;
             input.className = 'buff-check';
-            if (group.exclusive) input.name = `excl-${gi}`;
+            if (group.exclusive) {
+                input.name = `excl-${gi}`;
+                input.addEventListener('change', () => {
+                    group.buffs.forEach(b => {
+                        if (b.id !== def.id) removeTimer(b.id);
+                    });
+                });
+            }
 
             const nameSpan = document.createElement('span');
             nameSpan.className   = 'buff-toggle-name';
