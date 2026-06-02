@@ -134,38 +134,17 @@ function _drawTimer(t, cx, cy, r) {
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
 
-    if (t.iconImg) {
-        // Icon layout: icon in upper portion, time below
-        const iconR  = r * 0.32;
-        const iconCy = cy - r * 0.18;
-        const timeFontSize = Math.max(10, Math.floor(r * 0.30));
+    const timeFontSize = Math.max(10, Math.floor(r * 0.36));
+    const nameFontSize = Math.max(8,  Math.floor(r * 0.18));
+    const nameColor    = t.done ? '#484f58' : '#6e7681';
 
-        // Circular clip for icon
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, iconCy, iconR, 0, TAU);
-        ctx.clip();
-        ctx.drawImage(t.iconImg, cx - iconR, iconCy - iconR, iconR * 2, iconR * 2);
-        ctx.restore();
+    ctx.fillStyle = timeColor;
+    ctx.font      = `bold ${timeFontSize}px monospace`;
+    ctx.fillText(timeStr, cx, cy - nameFontSize * 0.7);
 
-        // Time below icon
-        ctx.fillStyle = timeColor;
-        ctx.font      = `bold ${timeFontSize}px monospace`;
-        ctx.fillText(timeStr, cx, cy + r * 0.42);
-    } else {
-        // Text-only layout: time + name
-        const timeFontSize = Math.max(10, Math.floor(r * 0.36));
-        const nameFontSize = Math.max(8,  Math.floor(r * 0.18));
-        const nameColor    = t.done ? '#484f58' : '#6e7681';
-
-        ctx.fillStyle = timeColor;
-        ctx.font      = `bold ${timeFontSize}px monospace`;
-        ctx.fillText(timeStr, cx, cy - nameFontSize * 0.7);
-
-        ctx.fillStyle = nameColor;
-        ctx.font      = `${nameFontSize}px system-ui, sans-serif`;
-        ctx.fillText(_clip(t.name || '버프', r * 1.6), cx, cy + timeFontSize * 0.55);
-    }
+    ctx.fillStyle = nameColor;
+    ctx.font      = `${nameFontSize}px system-ui, sans-serif`;
+    ctx.fillText(_clip(t.name || '버프', r * 1.6), cx, cy + timeFontSize * 0.55);
 }
 
 function _render(timers) {
