@@ -843,3 +843,184 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     border-radius: 8px;
 }
 .rate-pity-row .rate-prob { color: var(--accent-color); }
+
+/* ===== Timer page ===== */
+.timer-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pip-btn {
+    height: 46px;
+    padding: 0 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.pip-btn:hover:not(:disabled) { border-color: var(--accent-color); color: var(--accent-color); }
+.pip-btn.pip-active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+.pip-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.timer-card { transition: box-shadow 0.3s; }
+.timer-card.timer-done { opacity: 0.65; }
+
+.timer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.timer-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    font-size: 1rem;
+}
+.timer-icon-btn:hover { border-color: var(--accent-color); }
+.timer-icon-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+}
+
+.timer-name-input {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.timer-name-input:focus { border-color: var(--accent-color); }
+
+.timer-delete-btn {
+    background: none;
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--sub-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+.timer-delete-btn:hover { border-color: #f03e3e; color: #f03e3e; }
+
+.timer-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.timer-duration-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.timer-dur-label {
+    font-size: 0.75rem;
+    color: var(--sub-text);
+    font-weight: 600;
+    text-align: center;
+}
+.timer-duration-setting {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.timer-dur-input {
+    width: 56px;
+    padding: 6px 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: monospace;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    text-align: center;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.timer-dur-input:focus { border-color: var(--accent-color); }
+.timer-dur-input:disabled { opacity: 0.45; cursor: not-allowed; }
+.timer-dur-sep {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--sub-text);
+    user-select: none;
+    line-height: 1;
+}
+
+.timer-display {
+    font-size: 2.8rem;
+    font-weight: bold;
+    font-family: monospace;
+    letter-spacing: 2px;
+    color: var(--text-color);
+    min-width: 140px;
+    text-align: right;
+    transition: color 0.3s;
+}
+.timer-card.timer-running .timer-display { color: var(--accent-color); }
+.timer-card.timer-done    .timer-display { color: var(--sub-text); }
+.timer-card.timer-urgent:not(.timer-done) .timer-display { color: #f85149; }
+
+.timer-progress {
+    height: 8px;
+    background: var(--card-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.timer-progress-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    background: #3fb950;
+    transition: background-color 0.5s;
+}
+.timer-progress-fill.pct-mid { background: #d29922; }
+.timer-progress-fill.pct-low { background: #f85149; }
+
+.timer-controls {
+    display: flex;
+    gap: 10px;
+}
+.timer-controls .calc-btn { flex: 1; }
+
+@keyframes timer-done-flash {
+    0%   { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    35%  { box-shadow: 0 0 0 5px rgba(248,81,73,0.45), 0 4px 12px rgba(0,0,0,0.1); }
+    100% { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+}
+.timer-card.timer-just-done { animation: timer-done-flash 0.7s ease-out; }

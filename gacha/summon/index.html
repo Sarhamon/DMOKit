@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMOKit - 데이터 드로우 시뮬레이터</title>
+    <title>DMOKit - 데이터 소환 시뮬레이터</title>
     <script>
         if (localStorage.getItem('dmo_theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
         }
     </script>
-    <link rel="stylesheet" href="style.css">
-    <meta property="og:title" content="DMOKit - 데이터 드로우 시뮬레이터">
-    <meta property="og:description" content="디지몬 마스터즈 데이터 드로우 확률 기반 시뮬레이션">
-    <meta property="og:image" content="./dmo.png">
+    <link rel="stylesheet" href="../../css/style.css">
+    <meta property="og:title" content="DMOKit - 데이터 소환 시뮬레이터">
+    <meta property="og:description" content="디지몬 마스터즈 데이터 소환 - 천장 시스템 포함">
+    <meta property="og:image" content="../../img/dmo.png">
 </head>
 <body>
 
     <div class="header-container">
-        <a href="gacha.html" class="home-link" aria-label="가챠 메뉴로">← 가챠</a>
+        <a href="../" class="home-link" aria-label="가챠 메뉴로">← 가챠</a>
         <div class="header-content">
-            <h2>데이터 드로우 시뮬레이터</h2>
-            <p class="subtitle">공식 확률 기반 뽑기 체험</p>
+            <h2>데이터 소환 시뮬레이터</h2>
+            <p class="subtitle">캡슐을 사용하여 디지몬/아이템 소환 (천장 시스템 포함)</p>
         </div>
         <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
     </div>
 
     <div class="inv-bar">
         <span id="invCount">인벤토리: 0개</span>
-        <a href="fusion.html" class="inv-link">융합으로 →</a>
+        <a href="../fusion/" class="inv-link">융합으로 →</a>
     </div>
 
     <div class="card">
         <div class="draw-selector">
-            <label for="drawSelect">드로우 선택</label>
-            <select id="drawSelect"></select>
-            <div class="draw-meta" id="drawMeta">—</div>
+            <label for="summonSelect">캡슐 선택</label>
+            <select id="summonSelect"></select>
+            <div class="draw-meta" id="summonMeta">—</div>
         </div>
 
         <div class="draw-controls">
-            <button class="calc-btn" id="pull1Btn">1회 뽑기</button>
-            <button class="calc-btn secondary" id="resetBtn">초기화</button>
+            <button class="calc-btn" id="summon1Btn">1회 소환</button>
+            <button class="calc-btn" id="summon10Btn">10회 소환</button>
+            <button class="calc-btn secondary" id="resetBtn">통계 초기화</button>
         </div>
+
+        <div class="pity-display" id="summonPityDisplay"></div>
     </div>
 
     <div class="card">
@@ -57,10 +60,10 @@
     <div class="card">
         <h3 class="section-title">이번 결과 <span class="result-count" id="resultCount"></span></h3>
         <div class="result-grid" id="resultGrid">
-            <div class="empty-msg">뽑기 버튼을 눌러주세요.</div>
+            <div class="empty-msg">소환 버튼을 눌러주세요.</div>
         </div>
     </div>
 
-    <script type="module" src="js/gacha/draw.js"></script>
+    <script type="module" src="../../js/gacha/summon.js"></script>
 </body>
 </html>
