@@ -65,16 +65,31 @@ function tick() {
 
 // ── Card render ────────────────────────────────────────────────────────────────
 
+const RING_CIRC = 2 * Math.PI * 50; // r=50 in viewBox 120×120
+
+function fmtCountdown(rem) {
+    const h = Math.floor(rem / 3600);
+    const m = Math.floor((rem % 3600) / 60);
+    const s = Math.floor(rem % 60);
+    if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
 function renderCard(t) {
     const el = document.createElement('div');
     el.className = 'timer-card card';
     el.id = `tc-${t.id}`;
     el.innerHTML = `
-        <div class="timer-header-simple">
-            <span class="timer-preset-name">${t.name}</span>
-            <div class="timer-display">--:--</div>
+        <div class="timer-ring-wrap">
+            <svg class="timer-ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="timer-ring-track" cx="60" cy="60" r="50"/>
+                <circle class="timer-ring-fill"  cx="60" cy="60" r="50"/>
+            </svg>
+            <div class="timer-ring-text">
+                <div class="timer-display">--:--</div>
+                <div class="timer-ring-name">${t.name}</div>
+            </div>
         </div>
-        <div class="timer-progress"><div class="timer-progress-fill"></div></div>
         <div class="timer-controls">
             <button class="calc-btn timer-start-btn">시작</button>
             <button class="calc-btn secondary timer-reset-btn">초기화</button>
@@ -100,14 +115,24 @@ function refresh(t) {
         card.addEventListener('animationend', () => card.classList.remove('timer-just-done'), { once: true });
     }
 
-    const m = Math.floor(rem / 60);
-    const s = Math.floor(rem % 60);
-    card.querySelector('.timer-display').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    // Countdown text
+    const displayEl = card.querySelector('.timer-display');
+    displayEl.textContent = fmtCountdown(rem);
+    displayEl.classList.toggle('has-hours', rem >= 3600);
 
-    const fill = card.querySelector('.timer-progress-fill');
-    fill.style.width = `${pct * 100}%`;
-    fill.classList.toggle('pct-mid', pct <= 0.5 && pct > 0.25);
-    fill.classList.toggle('pct-low', pct <= 0.25 && !t.done);
+    // Ring fill
+    const ringFill = card.querySelector('.timer-ring-fill');
+    ringFill.style.strokeDashoffset = RING_CIRC * (1 - pct);
+    if (t.done) {
+        ringFill.style.stroke = '';
+        ringFill.classList.add('ring-done');
+    } else if (t.running) {
+        ringFill.classList.remove('ring-done');
+        ringFill.style.stroke = pct > 0.5 ? '#3fb950' : pct > 0.25 ? '#d29922' : '#f85149';
+    } else {
+        ringFill.classList.remove('ring-done');
+        ringFill.style.stroke = '';
+    }
 
     card.classList.toggle('timer-running', t.running);
     card.classList.toggle('timer-done',    t.done);

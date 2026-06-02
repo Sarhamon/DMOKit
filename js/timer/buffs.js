@@ -8,8 +8,8 @@ export const BUFF_GROUPS = [
         label: '증폭 (택 1)',
         exclusive: true,
         buffs: [
-            { id: 'super_amp', name: '슈퍼증폭부스터', duration: 3600 },
-            { id: 'amp',       name: '증폭부스터',     duration: 1800 },
+            { id: 'super_amp', name: '슈퍼증폭부스터', duration: 3900 },
+            { id: 'amp',       name: '증폭부스터',     duration: 1860 },
         ],
     },
     {

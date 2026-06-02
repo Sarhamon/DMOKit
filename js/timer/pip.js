@@ -1,8 +1,12 @@
-let canvas = null;
-let ctx    = null;
-let video  = null;
-let rafId  = null;
+let canvas     = null;
+let ctx        = null;
+let video      = null;
+let _loopId    = null;
 let _getTimers = null;
+
+// Layout cached by timer count — recomputed only when count changes
+let _layoutCache = null;
+let _layoutCount = -1;
 
 export function isPiPSupported() {
     return !!document.pictureInPictureEnabled;
@@ -23,12 +27,12 @@ export async function enterPiP(getTimers) {
     // Draw before captureStream so the stream has a frame immediately.
     // Without this the video readyState stays HAVE_NOTHING and
     // requestPictureInPicture throws InvalidStateError.
-    _render(getTimers());
+    _draw();
 
     const stream = canvas.captureStream();
     video = document.createElement('video');
-    video.srcObject = stream;
-    video.muted = true;
+    video.srcObject  = stream;
+    video.muted      = true;
     video.playsInline = true;
     // Must be in the DOM; detached elements throw NotSupportedError.
     video.style.cssText = 'position:fixed;width:1px;height:1px;top:-2px;left:-2px;opacity:0;pointer-events:none';
@@ -52,7 +56,10 @@ export async function enterPiP(getTimers) {
         document.dispatchEvent(new CustomEvent('pip-leave'));
     });
 
-    _startLoop();
+    // 1 fps is enough for a seconds-precision timer and avoids
+    // creating hundreds of objects and repainting the canvas 60×/sec.
+    _loopId = setInterval(_draw, 1000);
+
     await video.requestPictureInPicture();
 }
 
@@ -63,24 +70,24 @@ export function exitPiP() {
 }
 
 function _cleanup() {
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (_loopId) { clearInterval(_loopId); _loopId = null; }
     video?.remove();
-    canvas = null;
-    ctx    = null;
-    video  = null;
-    _getTimers = null;
+    canvas       = null;
+    ctx          = null;
+    video        = null;
+    _getTimers   = null;
+    _layoutCache = null;
+    _layoutCount = -1;
 }
 
-function _startLoop() {
-    function loop() {
-        if (!canvas || !ctx) return;
-        _render(_getTimers ? _getTimers() : []);
-        rafId = requestAnimationFrame(loop);
-    }
-    rafId = requestAnimationFrame(loop);
+function _draw() {
+    if (!canvas || !ctx) return;
+    _render(_getTimers ? _getTimers() : []);
 }
 
 function _layout(n, W, H) {
+    if (n === _layoutCount && _layoutCache) return _layoutCache;
+
     let cols, rows;
     if      (n <= 2) { cols = n; rows = 1; }
     else if (n <= 4) { cols = 2; rows = Math.ceil(n / 2); }
@@ -88,11 +95,37 @@ function _layout(n, W, H) {
     const cellW = W / cols;
     const cellH = H / rows;
     const r = Math.min(cellW, cellH) * 0.38;
-    return Array.from({ length: n }, (_, i) => ({
+
+    _layoutCache = Array.from({ length: n }, (_, i) => ({
         cx: cellW * (i % cols) + cellW / 2,
         cy: cellH * Math.floor(i / cols) + cellH / 2,
         r,
     }));
+    _layoutCount = n;
+    return _layoutCache;
+}
+
+function _theme() {
+    const dark = document.documentElement.classList.contains('dark-mode');
+    return dark ? {
+        bg:        '#0d1117',
+        track:     '#2d333b',
+        timeRun:   '#58a6ff',
+        timePause: '#c9d1d9',
+        timeDone:  '#484f58',
+        name:      '#6e7681',
+        nameDone:  '#484f58',
+        empty:     '#6e7681',
+    } : {
+        bg:        '#f1f3f5',
+        track:     '#dee2e6',
+        timeRun:   '#228be6',
+        timePause: '#333333',
+        timeDone:  '#adb5bd',
+        name:      '#868e96',
+        nameDone:  '#adb5bd',
+        empty:     '#868e96',
+    };
 }
 
 function _clip(text, maxW) {
@@ -102,16 +135,16 @@ function _clip(text, maxW) {
     return t + '…';
 }
 
-function _drawTimer(t, cx, cy, r) {
-    const pct  = t.duration > 0 ? Math.max(0, Math.min(1, t.remaining / t.duration)) : 0;
-    const sw   = Math.max(5, r * 0.13);
-    const TAU  = Math.PI * 2;
-    const TOP  = -Math.PI / 2;
+function _drawTimer(t, cx, cy, r, c) {
+    const pct = t.duration > 0 ? Math.max(0, Math.min(1, t.remaining / t.duration)) : 0;
+    const sw  = Math.max(5, r * 0.13);
+    const TAU = Math.PI * 2;
+    const TOP = -Math.PI / 2;
 
     // Track ring
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, TAU);
-    ctx.strokeStyle = '#2d333b';
+    ctx.strokeStyle = c.track;
     ctx.lineWidth   = sw;
     ctx.lineCap     = 'butt';
     ctx.stroke();
@@ -126,17 +159,20 @@ function _drawTimer(t, cx, cy, r) {
         ctx.stroke();
     }
 
-    const timeColor = t.done ? '#484f58' : (t.running ? '#58a6ff' : '#c9d1d9');
-    const mins      = Math.floor(t.remaining / 60);
-    const secs      = Math.floor(t.remaining % 60);
-    const timeStr   = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    const h       = Math.floor(t.remaining / 3600);
+    const m       = Math.floor((t.remaining % 3600) / 60);
+    const s       = Math.floor(t.remaining % 60);
+    const timeStr = h > 0
+        ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+        : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+    const timeFontSize = Math.max(10, Math.floor(r * (h > 0 ? 0.26 : 0.36)));
+    const nameFontSize = Math.max(8,  Math.floor(r * 0.18));
+    const timeColor    = t.done ? c.timeDone : (t.running ? c.timeRun : c.timePause);
+    const nameColor    = t.done ? c.nameDone : c.name;
 
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-
-    const timeFontSize = Math.max(10, Math.floor(r * 0.36));
-    const nameFontSize = Math.max(8,  Math.floor(r * 0.18));
-    const nameColor    = t.done ? '#484f58' : '#6e7681';
 
     ctx.fillStyle = timeColor;
     ctx.font      = `bold ${timeFontSize}px monospace`;
@@ -149,11 +185,13 @@ function _drawTimer(t, cx, cy, r) {
 
 function _render(timers) {
     const W = 400, H = 300;
-    ctx.fillStyle = '#0d1117';
+    const c = _theme();
+
+    ctx.fillStyle = c.bg;
     ctx.fillRect(0, 0, W, H);
 
     if (!timers.length) {
-        ctx.fillStyle    = '#6e7681';
+        ctx.fillStyle    = c.empty;
         ctx.font         = '16px system-ui, sans-serif';
         ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
@@ -163,7 +201,6 @@ function _render(timers) {
 
     const positions = _layout(timers.length, W, H);
     timers.forEach((t, i) => {
-        const { cx, cy, r } = positions[i];
-        _drawTimer(t, cx, cy, r);
+        _drawTimer(t, positions[i].cx, positions[i].cy, positions[i].r, c);
     });
 }
