@@ -32,11 +32,22 @@
 
     <div class="card">
         <div class="fusion-controls">
-            <div class="fusion-mode-toggle">
-                <button class="mode-btn active" data-mode="auto">자동</button>
-                <button class="mode-btn" data-mode="SSS">SSS</button>
-                <button class="mode-btn" data-mode="SSS+">SSS+</button>
+            <div class="buff-group-buttons">
+                <label class="buff-toggle">
+                    <input type="radio" name="fusion-mode" value="auto" class="buff-check" checked>
+                    <span class="buff-toggle-name">자동</span>
+                </label>
+                <label class="buff-toggle">
+                    <input type="radio" name="fusion-mode" value="SSS" class="buff-check">
+                    <span class="buff-toggle-name">SSS</span>
+                </label>
+                <label class="buff-toggle">
+                    <input type="radio" name="fusion-mode" value="SSS+" class="buff-check">
+                    <span class="buff-toggle-name">SSS+</span>
+                </label>
             </div>
+
+            <div class="fusion-avail" id="fusionAvail"></div>
 
             <div class="mode-pane">
                 <button class="calc-btn" id="fuse10Btn">10회 합성</button>

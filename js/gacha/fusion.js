@@ -249,11 +249,9 @@ function onClearInventory() {
 if (fuse10Btn) fuse10Btn.addEventListener('click', () => fuseAuto(FUSION_BATCH_SIZE));
 if (clearInvBtn) clearInvBtn.addEventListener('click', onClearInventory);
 
-const modeButtons = document.querySelectorAll('.mode-btn');
-modeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentMode = btn.dataset.mode;
-        modeButtons.forEach(b => b.classList.toggle('active', b === btn));
+document.querySelectorAll('input[name="fusion-mode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        currentMode = radio.value;
         updateFusionAvail();
     });
 });

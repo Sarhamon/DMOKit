@@ -7,11 +7,11 @@ import { flipCardWrap, revealAllRowHTML, setupFlip } from './flipCard.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
-const summonSelect = document.getElementById('summonSelect');
 const summonMeta = document.getElementById('summonMeta');
 const summon1Btn = document.getElementById('summon1Btn');
 const summon10Btn = document.getElementById('summon10Btn');
 const resetBtn = document.getElementById('resetBtn');
+const autoRevealCheck = document.getElementById('autoRevealCheck');
 const statTotal = document.getElementById('statTotal');
 const statGradeList = document.getElementById('statGradeList');
 const resultGrid = document.getElementById('resultGrid');
@@ -46,10 +46,24 @@ function pullOne(items) {
     return items[items.length - 1];
 }
 
-function populateSelector() {
-    summonSelect.innerHTML = summons.map((s, i) =>
-        `<option value="${i}">${escapeHtml(s.name)}</option>`
+function populatePicker() {
+    const picker = document.getElementById('summonPicker');
+    const activeSection = document.getElementById('summonActiveSection');
+    picker.innerHTML = summons.map((s, i) =>
+        `<label class="buff-toggle">
+            <input type="radio" name="summon-pick" value="${i}" class="buff-check">
+            <span class="buff-toggle-name">${escapeHtml(s.name)}</span>
+        </label>`
     ).join('');
+    picker.querySelectorAll('input').forEach(radio => {
+        radio.addEventListener('change', () => {
+            currentSummon = summons[parseInt(radio.value, 10)];
+            updateMeta();
+            resetStats();
+            renderPity();
+            activeSection.hidden = false;
+        });
+    });
 }
 
 function updateMeta() {
@@ -112,6 +126,11 @@ function renderResults(items) {
     }
     resultGrid.innerHTML = parts.join('');
     setupFlip(resultGrid, onCardReveal);
+    if (autoRevealCheck?.checked) {
+        const btn = resultGrid.querySelector('.reveal-all-btn');
+        if (btn) btn.click();
+        else resultGrid.querySelector('.flip-card:not(.revealed)')?.click();
+    }
 }
 
 function onCardReveal(card) {
@@ -164,19 +183,11 @@ function summon(tickets) {
     renderPity();
 }
 
-function onSummonChange() {
-    currentSummon = summons[parseInt(summonSelect.value, 10)];
-    updateMeta();
-    resetStats();
-    renderPity();
-}
-
 function updateInvCount() {
     const el = document.getElementById('invCount');
     if (el) el.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
 }
 
-summonSelect.addEventListener('change', onSummonChange);
 summon1Btn.addEventListener('click', () => summon(1));
 summon10Btn.addEventListener('click', () => summon(10));
 resetBtn.addEventListener('click', resetStats);
@@ -187,6 +198,5 @@ subscribe(() => {
 });
 
 loadTheme();
-populateSelector();
-onSummonChange();
+populatePicker();
 updateInvCount();

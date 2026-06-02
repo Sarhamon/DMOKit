@@ -6,10 +6,10 @@ import { maybeUpgrade } from './upgrade.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
 
-const drawSelect = document.getElementById('drawSelect');
 const drawMeta = document.getElementById('drawMeta');
 const pull1Btn = document.getElementById('pull1Btn');
 const resetBtn = document.getElementById('resetBtn');
+const autoRevealCheck = document.getElementById('autoRevealCheck');
 const statTotal = document.getElementById('statTotal');
 const statGradeList = document.getElementById('statGradeList');
 const resultGrid = document.getElementById('resultGrid');
@@ -43,10 +43,23 @@ function pullOne(draw) {
     return draw.items[draw.items.length - 1];
 }
 
-function populateDrawSelector() {
-    drawSelect.innerHTML = draws.map((d, i) =>
-        `<option value="${i}">${escapeHtml(d.name)}</option>`
+function populatePicker() {
+    const picker = document.getElementById('drawPicker');
+    const activeSection = document.getElementById('drawActiveSection');
+    picker.innerHTML = draws.map((d, i) =>
+        `<label class="buff-toggle">
+            <input type="radio" name="draw-pick" value="${i}" class="buff-check">
+            <span class="buff-toggle-name">${escapeHtml(d.name)}</span>
+        </label>`
     ).join('');
+    picker.querySelectorAll('input').forEach(radio => {
+        radio.addEventListener('change', () => {
+            currentDraw = draws[parseInt(radio.value, 10)];
+            updateDrawMeta();
+            resetStats();
+            activeSection.hidden = false;
+        });
+    });
 }
 
 function updateDrawMeta() {
@@ -120,6 +133,11 @@ function renderResults(items) {
     }
     resultGrid.innerHTML = parts.join('');
     setupFlip(resultGrid, onCardReveal);
+    if (autoRevealCheck?.checked) {
+        const btn = resultGrid.querySelector('.reveal-all-btn');
+        if (btn) btn.click();
+        else resultGrid.querySelector('.flip-card:not(.revealed)')?.click();
+    }
 }
 
 function onCardReveal(card) {
@@ -143,24 +161,16 @@ function pull(tickets) {
     renderResults(results);
 }
 
-function onDrawChange() {
-    currentDraw = draws[parseInt(drawSelect.value, 10)];
-    updateDrawMeta();
-    resetStats();
-}
-
 function updateInvCount() {
     const el = document.getElementById('invCount');
     if (el) el.textContent = `인벤토리: ${getTotalCount().toLocaleString()}개`;
 }
 
-drawSelect.addEventListener('change', onDrawChange);
 pull1Btn.addEventListener('click', () => pull(1));
 resetBtn.addEventListener('click', resetStats);
 document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
 subscribe(updateInvCount);
 
 loadTheme();
-populateDrawSelector();
-onDrawChange();
+populatePicker();
 updateInvCount();

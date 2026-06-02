@@ -324,10 +324,16 @@ tr:last-child td { border-bottom: none; }
     cursor: pointer;
 }
 .draw-selector select:focus { border-color: var(--accent-color); outline: none; }
+.draw-active {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+}
 .draw-meta {
     font-size: 0.85rem;
     color: var(--sub-text);
     padding: 4px 2px;
+    margin-bottom: 12px;
 }
 
 .draw-controls {
@@ -337,6 +343,16 @@ tr:last-child td { border-bottom: none; }
     gap: 12px;
     flex-wrap: wrap;
 }
+.auto-reveal-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--sub-text);
+    cursor: pointer;
+    user-select: none;
+}
+.auto-reveal-label input { accent-color: var(--accent-color); cursor: pointer; }
 .multi-pull { display: flex; align-items: center; gap: 8px; }
 .multi-pull input[type="number"] {
     width: 90px;

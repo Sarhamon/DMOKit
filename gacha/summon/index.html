@@ -32,18 +32,21 @@
 
     <div class="card">
         <div class="draw-selector">
-            <label for="summonSelect">캡슐 선택</label>
-            <select id="summonSelect"></select>
+            <label>캡슐 선택</label>
+            <div class="buff-group-buttons" id="summonPicker"></div>
+        </div>
+        <div class="draw-active" id="summonActiveSection" hidden>
             <div class="draw-meta" id="summonMeta">—</div>
+            <div class="draw-controls">
+                <button class="calc-btn" id="summon1Btn">1회 소환</button>
+                <button class="calc-btn" id="summon10Btn">10회 소환</button>
+                <button class="calc-btn secondary" id="resetBtn">통계 초기화</button>
+                <label class="auto-reveal-label">
+                    <input type="checkbox" id="autoRevealCheck"> 자동 공개
+                </label>
+            </div>
+            <div class="pity-display" id="summonPityDisplay"></div>
         </div>
-
-        <div class="draw-controls">
-            <button class="calc-btn" id="summon1Btn">1회 소환</button>
-            <button class="calc-btn" id="summon10Btn">10회 소환</button>
-            <button class="calc-btn secondary" id="resetBtn">통계 초기화</button>
-        </div>
-
-        <div class="pity-display" id="summonPityDisplay"></div>
     </div>
 
     <div class="card">
