@@ -56,9 +56,9 @@ export async function enterPiP(getTimers) {
         document.dispatchEvent(new CustomEvent('pip-leave'));
     });
 
-    // 1 fps is enough for a seconds-precision timer and avoids
-    // creating hundreds of objects and repainting the canvas 60×/sec.
-    _loopId = setInterval(_draw, 1000);
+    // 4 fps: max ~250 ms visual lag (imperceptible on a seconds display)
+    // vs 60 fps RAF that caused memory growth. 15× fewer draws than RAF.
+    _loopId = setInterval(_draw, 250);
 
     await video.requestPictureInPicture();
 }
