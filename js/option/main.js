@@ -79,10 +79,11 @@ function restoreResume(slotId) {
 
 function saveSnap() {
     const arr = store.snaps[sim.slotId] ?? (store.snaps[sim.slotId] = []);
+    const item = cfg().items[sim.itemIndex];
     arr.push({
         itemIndex: sim.itemIndex,
-        itemName: cfg().items[sim.itemIndex].name,
-        lines: sim.lines.map(o => ({ name: o.name, val: fmtVal(o) })),
+        itemName: item.name,
+        lines: sim.lines.map(o => ({ name: o.name, val: fmtVal(o), tier: getEquipTier(item, o.name, o.max) })),
     });
     persist();
 }
@@ -126,7 +127,24 @@ function renderSlots() {
         </div>`;
 }
 
-// 옵션 수치 표기 (수치 롤은 추후 — 지금은 범위를 참고용으로 표시)
+// 장비(linePools) 전용: 같은 이름 옵션이 풀마다 max가 다를 때 상/중/하옵 판정.
+// max 값의 rank(오름차순 정렬 후 위치)로 결정. unique max가 1개면 뱃지 없음.
+function getEquipTier(item, optName, optMax) {
+    if (!item.linePools) return null;
+    const maxSet = [...new Set(
+        item.linePools.flatMap(pool => pool.filter(o => o.name === optName).map(o => o.max))
+    )].sort((a, b) => a - b);
+    if (maxSet.length <= 1) return null;
+    const idx = maxSet.indexOf(optMax);
+    if (idx === -1) return null;
+    const rank = idx / (maxSet.length - 1);
+    if (rank >= 0.67) return 'high';
+    if (rank >= 0.33) return 'mid';
+    return 'low';
+}
+
+const TIER_LABEL = { high: '상옵', mid: '중옵', low: '하옵' };
+
 function fmtVal(o) {
     const f = n => (o.dp ? n.toFixed(o.dp) : String(n));
     return o.min === o.max ? f(o.min) : `${f(o.min)} ~ ${f(o.max)}`;
@@ -209,6 +227,7 @@ function reroll() {
 }
 
 function linesHtml() {
+    const item = cfg().items[sim.itemIndex];
     const max = maxLockOf(cfg());
     const lockFull = sim.locked.size >= max;
     return sim.lines.map((o, i) => {
@@ -216,9 +235,11 @@ function linesHtml() {
         const lockBtn = max > 0
             ? `<button class="opt-lock" data-idx="${i}"${!locked && lockFull ? ' disabled' : ''} aria-pressed="${locked}" aria-label="고정">${locked ? '🔒' : '🔓'}</button>`
             : '';
+        const t = getEquipTier(item, o.name, o.max);
+        const badge = t ? `<span class="opt-tier opt-tier-${t}">${TIER_LABEL[t]}</span>` : '';
         return `
         <li class="opt-line${locked ? ' locked' : ''}">
-            <span class="opt-line-name">${o.name}</span>
+            <span class="opt-line-name">${o.name}${badge}</span>
             <span class="opt-line-val">${fmtVal(o)}</span>
             ${lockBtn}
         </li>`;
@@ -243,7 +264,7 @@ function snapsHtml(slotId) {
                     <button class="opt-snap-del" data-i="${i}">삭제</button>
                 </span>
             </div>
-            <div class="opt-snap-lines">${s.lines.map(l => `<span>${l.name} ${l.val}</span>`).join('')}</div>
+            <div class="opt-snap-lines">${s.lines.map(l => `<span>${l.name}${l.tier ? `<span class="opt-tier opt-tier-${l.tier}">${TIER_LABEL[l.tier]}</span>` : ''} ${l.val}</span>`).join('')}</div>
         </li>`).join('');
 }
 

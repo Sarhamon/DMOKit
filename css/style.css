@@ -410,6 +410,24 @@ h2 { margin-bottom: 5px; color: var(--text-color); }
     color: var(--sub-text);
 }
 
+.opt-tier {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    margin-left: 4px;
+    vertical-align: middle;
+    line-height: 1.5;
+}
+.opt-tier-high { background: #ffe066; color: #6a4c00; }
+.opt-tier-mid  { background: #69db7c; color: #1a5c2a; }
+.opt-tier-low  { background: #ff6b6b; color: #7d0000; }
+
+html.dark-mode .opt-tier-high { background: #5c4200; color: #ffd43b; }
+html.dark-mode .opt-tier-mid  { background: #1a4a2a; color: #69db7c; }
+html.dark-mode .opt-tier-low  { background: #5c0000; color: #ff8787; }
+
 .card { 
     background: var(--card-bg); 
     padding: 25px; 
