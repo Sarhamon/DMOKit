@@ -145,13 +145,6 @@ h2 { margin-bottom: 5px; color: var(--text-color); }
     border-radius: 4px;
 }
 
-.page-note {
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--sub-text);
-    margin: 0 0 20px;
-}
-
 .card { 
     background: var(--card-bg); 
     padding: 25px; 
