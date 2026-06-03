@@ -23,7 +23,7 @@ export const accessorySlots = {
                     { name: '방어력(%)',      min: 25,   max: 50,   dp: 2, cap: 1 },
                     { name: '최대 HP 증가(%)', min: 15,  max: 30,   dp: 2, cap: 1 },
                     { name: '최대 DS 증가(%)', min: 25,  max: 50,   dp: 2, cap: 1 },
-                    { name: '스킬 데미지 증가', min: 5,   max: 10,   dp: 2, cap: 1 },
+                    { name: '스킬 데미지 증가(%)', min: 5,   max: 10,   dp: 2, cap: 1 },
                 ],
             },
             {
