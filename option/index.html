@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMO 옵션 변경 시뮬레이터</title>
+    <script>
+        if (localStorage.getItem('dmo_theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <meta property="og:title" content="DMO 옵션 변경 시뮬레이터">
+    <meta property="og:description" content="장비 · 악세사리 슬롯을 클릭해 옵션을 변경해보는 시뮬레이터.">
+    <meta property="og:image" content="../img/dmo.png">
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="../" class="home-link" aria-label="메인 메뉴로">← 메인</a>
+        <div class="header-content">
+            <h2>DMO 옵션 변경 시뮬레이터</h2>
+            <p class="subtitle">슬롯을 클릭해 장비 · 악세사리 옵션 변경</p>
+        </div>
+        <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
+    </div>
+
+    <div class="card opt-layout">
+        <div class="slot-picker" id="slotPicker"></div>
+        <aside class="opt-panel" id="optPanel">
+            <p class="opt-empty">부위를 선택하면 옵션 변경 화면이 표시됩니다.</p>
+        </aside>
+    </div>
+
+    <script type="module" src="../js/option/main.js"></script>
+</body>
+</html>
