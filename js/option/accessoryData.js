@@ -44,6 +44,81 @@ export const accessorySlots = {
         ],
     },
 
+    necklace: {   // 목걸이
+        group: 'accessory',
+        lines: 5,
+        lockCost: { 0: 1, 1: 2, 2: 5 },
+        items: [
+            {
+                name: '찬란한 기적의 넥클레스',
+                pool: [
+                    { name: '최대체력',       min: 600, max: 1200, dp: 0, cap: 4 },
+                    { name: '디지소울',       min: 600, max: 1200, dp: 0, cap: 4 },
+                    { name: '방어력',         min: 50,  max: 100,  dp: 0, cap: 3 },
+                    { name: '크리티컬',       min: 5,   max: 10,   dp: 0, cap: 2 },
+                    { name: '기본속성피해',   min: 1,   max: 8,    dp: 0, cap: 2 },
+                    { name: '공격력',         min: 150, max: 300,  dp: 0, cap: 2 },
+                    { name: '공격속도',       min: 15,  max: 15,   dp: 0, cap: 1 },
+                    { name: '치명피해',       min: 15,  max: 30,   dp: 2, cap: 1 },
+                    { name: '스킬피해',       min: 200, max: 500,  dp: 0, cap: 1 },
+                    { name: '공격력(%)',      min: 2.5, max: 5,    dp: 2, cap: 1 },
+                    { name: '방어력(%)',      min: 25,  max: 50,   dp: 2, cap: 1 },
+                    { name: '최대 HP 증가(%)', min: 5,  max: 15,   dp: 2, cap: 1 },
+                    { name: '최대 DS 증가(%)', min: 25, max: 50,   dp: 2, cap: 1 },
+                ],
+            },
+        ],
+    },
+
+    belt: {       // 팔찌
+        group: 'accessory',
+        lines: 5,
+        lockCost: { 0: 1, 1: 2, 2: 5 },
+        items: [
+            {
+                name: '바이탈 브레스 디지바이스 -V-',
+                pool: [
+                    { name: '공격력',            min: 1000, max: 1500, dp: 0, cap: 2 },
+                    { name: '방어력',            min: 300,  max: 500,  dp: 0, cap: 2 },
+                    { name: '최대체력',          min: 2000, max: 3000, dp: 0, cap: 2 },
+                    { name: '디지소울',          min: 1500, max: 2500, dp: 0, cap: 2 },
+                    { name: '스킬피해',          min: 2000, max: 2500, dp: 0, cap: 2 },
+                    { name: '크리티컬',          min: 5,    max: 10,   dp: 0, cap: 2 },
+                    { name: '치명피해',          min: 25,   max: 40,   dp: 2, cap: 2 },
+                    { name: '회피',              min: 10,   max: 15,   dp: 0, cap: 2 },
+                    { name: '적중도',            min: 800,  max: 1200, dp: 0, cap: 2 },
+                    { name: '방어력(%)',         min: 15,   max: 20,   dp: 2, cap: 1 },
+                    { name: '최대 DS 증가(%)',    min: 5,    max: 10,   dp: 2, cap: 1 },
+                    { name: '최대 HP 증가(%)',    min: 5,    max: 10,   dp: 2, cap: 1 },
+                    { name: '스킬 데미지 증가(%)', min: 3,    max: 7,    dp: 2, cap: 1 },
+                    { name: '최종 데미지 증가(%)', min: 1,    max: 5,    dp: 2, cap: 1 },
+                ],
+            },
+        ],
+    },
+
+    ring: {       // 반지
+        group: 'accessory',
+        lines: 5,
+        lockCost: { 0: 1, 1: 2, 2: 5 },
+        items: [
+            {
+                name: '빛나는 아레나 반지',
+                pool: [
+                    { name: '최대체력',     min: 200, max: 960, dp: 0, cap: 2 },
+                    { name: '디지소울',     min: 200, max: 960, dp: 0, cap: 2 },
+                    { name: '방어력',       min: 10,  max: 30,  dp: 0, cap: 2 },
+                    { name: '크리티컬',     min: 1,   max: 6,   dp: 0, cap: 2 },
+                    { name: '공격력',       min: 100, max: 360, dp: 0, cap: 2 },
+                    { name: '스킬피해',     min: 100, max: 480, dp: 0, cap: 2 },
+                    { name: '기본속성피해', min: 1,   max: 6,   dp: 0, cap: 2 },
+                    { name: '치명피해',     min: 1,   max: 20,  dp: 2, cap: 1 },
+                    { name: '적중도',       min: 100, max: 500, dp: 0, cap: 1 },
+                ],
+            },
+        ],
+    },
+
     card: {
         group: 'accessory',      // 재화 = 옵션 변경 스톤
         lines: 2,
@@ -72,5 +147,4 @@ export const accessorySlots = {
         ],
     },
 
-    // 추후: necklace(목걸이) / belt(팔찌) / ring(반지)
 };
