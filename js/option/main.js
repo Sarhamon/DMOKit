@@ -59,7 +59,7 @@ function persist() {
 function saveResume() {
     store.resume[sim.slotId] = {
         itemIndex: sim.itemIndex,
-        lines: sim.lines.map(o => o.name),
+        lines: sim.lines.map(o => ({ name: o.name, max: o.max })),
         locked: [...sim.locked],
         stones: sim.stones,
     };
@@ -71,7 +71,11 @@ function restoreResume(slotId) {
     const r = store.resume[slotId];
     const item = slots[slotId].items[r?.itemIndex];
     if (!r || !item) return false;
-    const lines = r.lines.map((n, i) => resolveLine(item, i, n));
+    const lines = r.lines.map(l => {
+        const name = typeof l === 'string' ? l : l.name;       // 구버전 데이터(이름만) 호환
+        const max = typeof l === 'string' ? undefined : l.max;
+        return resolveLine(item, name, max);
+    });
     if (lines.length !== slots[slotId].lines || lines.some(o => !o)) return false;
     sim = { slotId, itemIndex: r.itemIndex, lines, locked: new Set(r.locked), stones: r.stones };
     return true;
@@ -83,7 +87,8 @@ function saveSnap() {
     arr.push({
         itemIndex: sim.itemIndex,
         itemName: item.name,
-        lines: sim.lines.map(o => ({ name: o.name, val: fmtVal(o), tier: getEquipTier(item, o.name, o.max) })),
+        // tier: 뱃지 표시용 · max: 복원용(합친 풀에서 정확한 등급 옵션 식별)
+        lines: sim.lines.map(o => ({ name: o.name, val: fmtVal(o), tier: getEquipTier(item, o.name, o.max), max: o.max })),
     });
     persist();
 }
@@ -98,7 +103,7 @@ function loadSnap(i) {
     const snap = store.snaps[sim.slotId][i];
     const item = cfg().items[snap.itemIndex];
     if (!item) return;
-    const lines = snap.lines.map((l, idx) => resolveLine(item, idx, l.name));
+    const lines = snap.lines.map(l => resolveLine(item, l.name, l.max));
     if (lines.some(o => !o)) return;
     sim.itemIndex = snap.itemIndex;
     sim.lines = lines;
@@ -125,6 +130,12 @@ function renderSlots() {
             <h3 class="slot-group-title">${GROUP_LABEL.accessory}</h3>
             <div class="slot-grid">${col('accessory')}</div>
         </div>`;
+}
+
+// 장비 추첨 풀: 줄별 풀(=등급)을 합친 데서 옵션 단위 균등 추첨. 상=마지막 풀, 중=그 앞 풀, 하=첫 풀(1·2줄 동일이라 1개만).
+function equipPool(item) {
+    const lp = item.linePools;
+    return [...lp[lp.length - 1], ...lp[lp.length - 2], ...lp[0]];
 }
 
 // 장비(linePools) 전용: 같은 이름 옵션이 풀마다 max가 다를 때 상/중/하옵 판정.
@@ -171,10 +182,15 @@ function rerollCost() {
     return cfg().lockCost[sim.locked.size];
 }
 
-// 줄 i의 옵션을 이름으로 복원 (줄별 풀이면 그 줄 풀에서, 통짜 풀이면 공통 풀에서).
-function resolveLine(item, i, name) {
-    const pool = item.linePools ? item.linePools[i] : item.pool;
-    return pool.find(o => o.name === name);
+// 저장된 줄을 옵션 객체로 복원. 장비는 합친 풀이라 같은 이름이 등급별로 max가 달라 name+max로 식별
+// (구버전 데이터엔 max가 없어 이름만으로 fallback). 악세는 통짜 풀에서 이름으로.
+function resolveLine(item, name, max) {
+    if (!item.linePools) return item.pool.find(o => o.name === name);
+    for (const p of item.linePools) {
+        const o = p.find(x => x.name === name && (max === undefined || x.max === max));
+        if (o) return o;
+    }
+    return undefined;
 }
 
 // 고정된 줄은 유지하고, 고정 안 된 줄만 다시 추첨.
@@ -183,10 +199,10 @@ function rollLines() {
     const lines = sim.lines.slice();
 
     if (item.linePools) {
-        // 장비: 각 줄이 자기 줄 풀에서 독립 추첨(중복 허용).
+        // 장비: 각 줄이 위치·등급에 상관없이 상·중·하 풀을 합친 데서 옵션 단위 균등으로 독립 추첨. 고정 줄만 유지.
+        const pool = equipPool(item);
         for (let i = 0; i < cfg().lines; i++) {
             if (sim.locked.has(i)) continue;
-            const pool = item.linePools[i];
             lines[i] = pool[Math.floor(Math.random() * pool.length)];
         }
         return lines;
@@ -306,6 +322,7 @@ function simBodyHtml(slotId) {
         <div class="opt-cost">
             <span>${cur} <b id="optStones">${sim.stones}</b>개</span>
             <span>총 비용 <b id="optTotal">${fmtBits(sim.stones * priceBits())}</b></span>
+            <button class="opt-save" id="optResetStones">사용 갯수 초기화</button>
         </div>
         <div class="opt-saved">
             <div class="opt-saved-head">
@@ -378,6 +395,13 @@ panel.addEventListener('click', e => {
     if (e.target.closest('#optReroll')) {
         reroll();
         refresh();
+        saveResume();
+        return;
+    }
+
+    if (e.target.closest('#optResetStones')) {
+        sim.stones = 0;
+        updateCost();
         saveResume();
         return;
     }
