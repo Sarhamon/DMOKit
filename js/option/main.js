@@ -200,8 +200,10 @@ function rollLines() {
     const lines = sim.lines.slice();
 
     if (item.linePools) {
-        // 장비: 각 줄이 위치·등급에 상관없이 상·중·하 풀을 합친 데서 옵션 단위 균등으로 독립 추첨. 고정 줄만 유지.
-        const pool = equipPool(item);
+        // 장비: 상·중·하 풀을 합친 데서 옵션 단위 균등 추첨. 잠금한 줄의 그 옵션은 풀에서 빼 다른 줄에 안 나오게 함
+        // (등급별 동명 옵션은 개별 취급 — 공격력 상옵을 잠가도 공격력 중옵은 가능). 고정 줄만 유지.
+        const lockedOpts = new Set([...sim.locked].map(i => sim.lines[i]));
+        const pool = equipPool(item).filter(o => !lockedOpts.has(o));
         for (let i = 0; i < cfg().lines; i++) {
             if (sim.locked.has(i)) continue;
             lines[i] = pool[Math.floor(Math.random() * pool.length)];
