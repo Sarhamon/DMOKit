@@ -200,13 +200,22 @@ function rollLines() {
     const lines = sim.lines.slice();
 
     if (item.linePools) {
-        // 장비: 상·중·하 풀을 합친 데서 옵션 단위 균등 추첨. 잠금한 줄의 그 옵션은 풀에서 빼 다른 줄에 안 나오게 함
-        // (등급별 동명 옵션은 개별 취급 — 공격력 상옵을 잠가도 공격력 중옵은 가능). 고정 줄만 유지.
+        // 장비: 상·중·하 풀을 합친 데서 옵션 단위 균등 추첨. 고정 줄만 유지.
+        //  · 중·상급 옵션은 4줄 통틀어 같은 옵션이 1개씩만(중복 금지). 하급 옵션은 중복 허용.
+        //  · 잠금한 줄의 그 옵션은 다른 줄 추첨에서 제외.
+        //  · 등급별 동명 옵션은 개별 취급 — 공격력 상옵과 공격력 중옵은 공존 가능.
+        const lp = item.linePools;
+        const all = equipPool(item);
+        const highOpts = new Set([...lp[lp.length - 1], ...lp[lp.length - 2]]);   // 중·상급 옵션
         const lockedOpts = new Set([...sim.locked].map(i => sim.lines[i]));
-        const pool = equipPool(item).filter(o => !lockedOpts.has(o));
+        const usedHigh = new Set([...lockedOpts].filter(o => highOpts.has(o)));   // 이미 쓰인 중·상급 옵션
         for (let i = 0; i < cfg().lines; i++) {
             if (sim.locked.has(i)) continue;
-            lines[i] = pool[Math.floor(Math.random() * pool.length)];
+            const avail = all.filter(o => !lockedOpts.has(o) && !usedHigh.has(o));
+            if (avail.length === 0) break;
+            const o = avail[Math.floor(Math.random() * avail.length)];
+            if (highOpts.has(o)) usedHigh.add(o);
+            lines[i] = o;
         }
         return lines;
     }
