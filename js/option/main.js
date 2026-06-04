@@ -157,7 +157,8 @@ function getEquipTier(item, optName, optMax) {
 const TIER_LABEL = { high: '상옵', mid: '중옵', low: '하옵' };
 
 function fmtVal(o) {
-    const f = n => (o.dp ? n.toFixed(o.dp) : String(n));
+    const u = o.unit ?? '';
+    const f = n => (o.dp ? n.toFixed(o.dp) : String(n)) + u;
     return o.min === o.max ? f(o.min) : `${f(o.min)} ~ ${f(o.max)}`;
 }
 
