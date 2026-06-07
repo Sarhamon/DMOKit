@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMOKit - 데이터 백업 / 복원</title>
+    <script>
+        if (localStorage.getItem('dmo_theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <link rel="icon" type="image/png" href="../img/dmo.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <meta property="og:title" content="DMOKit - 데이터 백업 / 복원">
+    <meta property="og:description" content="모든 도구의 저장 데이터를 코드로 내보내고 불러옵니다.">
+    <meta property="og:image" content="../img/dmo.png">
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="../" class="home-link" aria-label="메인 메뉴로">← 메인</a>
+        <div class="header-content">
+            <h2>데이터 백업 / 복원</h2>
+            <p class="subtitle">링크 · QR로 내보내기 / 가져오기</p>
+        </div>
+        <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
+    </div>
+
+    <div class="card backup-card">
+        <p class="backup-desc">모든 도구의 저장 데이터(테마 · 옵션 · 수집 · 돌파 · 가챠 등)를 <b>공유 링크</b>나 <b>QR</b>로 내보냅니다. 링크를 열거나 QR을 스캔하면 그 기기에서 바로 복원돼요. (링크/코드를 붙여넣어 가져오기도 가능)</p>
+        <div class="backup-actions">
+            <button id="exportBtn" class="calc-btn">📤 내보내기 (링크 복사)</button>
+            <button id="importBtn" class="calc-btn secondary">📥 가져오기</button>
+        </div>
+        <textarea id="backupText" class="backup-text" spellcheck="false"
+            placeholder="여기에 복원 링크가 표시됩니다. 가져오려면 링크(또는 코드)를 붙여넣고 '가져오기'를 누르세요."></textarea>
+        <div id="backupQr" class="backup-qr"></div>
+        <p id="backupMsg" class="backup-msg" role="status"></p>
+    </div>
+
+    <script src="../js/vendor/qrcode.js"></script>
+    <script type="module" src="../js/backup/main.js"></script>
+</body>
+</html>

@@ -154,6 +154,43 @@ h2 { margin-bottom: 5px; color: var(--text-color); }
     border-radius: 4px;
 }
 
+/* 데이터 백업 / 복원 */
+.backup-desc { margin: 0 0 14px; font-size: 0.88rem; color: var(--sub-text); }
+.backup-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.backup-text {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 90px;
+    resize: vertical;
+    padding: 10px 12px;
+    font-family: monospace;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    outline: none;
+    word-break: break-all;
+}
+.backup-text:focus { border-color: var(--accent-color); }
+.backup-qr { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 14px; }
+.backup-qr:empty { display: none; }
+.backup-qr-img {
+    width: 240px;
+    max-width: 100%;
+    image-rendering: pixelated;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+.backup-qr-note { margin: 0; font-size: 0.82rem; color: var(--sub-text); text-align: center; }
+.backup-msg { margin: 10px 0 0; font-size: 0.85rem; min-height: 1.2em; }
+.backup-msg.ok { color: #2f9e44; }
+.backup-msg.err { color: #e03131; }
+html.dark-mode .backup-msg.ok { color: #69db7c; }
+html.dark-mode .backup-msg.err { color: #ff8787; }
+
 /* 옵션 변경 시뮬레이터 */
 .opt-layout {
     display: flex;
