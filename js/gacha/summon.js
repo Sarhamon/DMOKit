@@ -49,12 +49,22 @@ function pullOne(items) {
 function populatePicker() {
     const picker = document.getElementById('summonPicker');
     const activeSection = document.getElementById('summonActiveSection');
-    picker.innerHTML = summons.map((s, i) =>
-        `<label class="buff-toggle">
-            <input type="radio" name="summon-pick" value="${i}" class="buff-check">
-            <span class="buff-toggle-name">${escapeHtml(s.name)}</span>
-        </label>`
-    ).join('');
+    const columns = [100, 150];
+    picker.innerHTML = columns.map(every => {
+        const buttons = summons
+            .map((s, i) => ({ s, i }))
+            .filter(({ s }) => s.pity?.every === every)
+            .map(({ s, i }) =>
+                `<label class="buff-toggle">
+                    <input type="radio" name="summon-pick" value="${i}" class="buff-check">
+                    <span class="buff-toggle-name">${escapeHtml(s.name)}</span>
+                </label>`
+            ).join('');
+        return `<div class="summon-picker-col">
+            <div class="summon-picker-col-title">${every}회 천장</div>
+            ${buttons}
+        </div>`;
+    }).join('');
     picker.querySelectorAll('input').forEach(radio => {
         radio.addEventListener('change', () => {
             currentSummon = summons[parseInt(radio.value, 10)];

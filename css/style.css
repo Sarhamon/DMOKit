@@ -1262,6 +1262,27 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     gap: 8px;
     flex-wrap: wrap;
 }
+#summonPicker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+.summon-picker-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.summon-picker-col .buff-toggle { flex: none; }
+.summon-picker-col-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--sub-text);
+    padding: 2px;
+}
+@media (max-width: 600px) {
+    #summonPicker { grid-template-columns: 1fr; }
+}
 .buff-toggle {
     flex: 1;
     min-width: 140px;
