@@ -3,6 +3,7 @@ import {
     MAX_ATTEMPTS, CELLS, PROB_START, PROB_MIN, PROB_MAX,
     STAGE_TABLE, INCREASE_POOL, DECREASE_POOL,
 } from './breakthroughData.js';
+import { recommend, ensureDP } from './recommend.js';
 
 // 5행 = 증가 3 + 감소 2 고정
 const ROW_KINDS = ['inc', 'inc', 'inc', 'dec', 'dec'];
@@ -17,6 +18,9 @@ const stageEls = [document.getElementById('btS1'), document.getElementById('btS2
 
 // 시뮬 상태: { count(공유), prob(공유), rows: [{ opt, pos, base, bonus }] }
 let sim;
+
+// 기대값상 추천 { best: 행 index | -1(멈춤), stop }. render()마다 갱신.
+let rec = { best: -1, stop: false };
 
 // 상태(시뮬 진행 + 주사위 + 가격)를 localStorage에 저장해 새로고침해도 유지.
 // 1 랜덤 능력치 = 주사위 1개. 가격은 비트 단위.
@@ -150,6 +154,13 @@ function renderRow(row, i) {
         el.title = '눌러서 돌파 시도';
         el.onclick = () => attempt(i);
     }
+    if (i === rec.best) {
+        el.classList.add('bt-row--rec');
+        const badge = document.createElement('span');
+        badge.className = 'bt-rec-badge';
+        badge.textContent = '★ 기대값 베스트';
+        el.appendChild(badge);
+    }
 
     const arrow = document.createElement('div');
     arrow.className = 'bt-arrow';
@@ -227,6 +238,15 @@ function render() {
     probEl.textContent = `${sim.prob}%`;
     STAGE_TABLE[sim.prob].forEach((p, i) => { stageEls[i].textContent = `${p}%`; });
 
+    // 옵션셋이 바뀌었으면 전역 최적표를 백그라운드 빌드 → 완료 시 자동 재렌더.
+    ensureDP(sim.rows, render);
+    // 기대값상 베스트 행 계산 (실패해도 UI는 동작하도록 방어)
+    try {
+        rec = recommend(sim.rows, sim.prob, sim.count);
+    } catch {
+        rec = { best: -1, stop: false, ready: false };
+    }
+
     rowsEl.innerHTML = '';
     sim.rows.forEach((row, i) => rowsEl.appendChild(renderRow(row, i)));
 
@@ -251,7 +271,13 @@ function render() {
         ? '돌파 시도 횟수를 모두 사용했습니다. (다시시도/랜덤 능력치로 초기화)'
         : allDone
             ? '모든 행이 완성되었습니다.'
-            : '강조된 칸을 클릭하면 해당 행을 1회 돌파 시도합니다.';
+            : rec.ready === false
+                ? '전역 최적표 계산 중…'
+                : rec.best >= 0
+                    ? `기대값상 베스트: ${sim.rows[rec.best].opt.kind === 'inc' ? '▲' : '▼'} ${sim.rows[rec.best].opt.name} 행 (★ 표시)`
+                    : rec.stop
+                        ? '기대값상 지금 멈추는 게 이득입니다. (더 누르면 손해)'
+                        : '강조된 칸을 클릭하면 해당 행을 1회 돌파 시도합니다.';
 }
 
 // 랜덤 능력치 = 주사위 1개 소모 후 옵션 재추첨
