@@ -1273,6 +1273,13 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
     flex-direction: column;
     gap: 8px;
 }
+.summon-picker-col--span {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.summon-picker-col--span .summon-picker-col-title { grid-column: 1 / -1; }
 .summon-picker-col .buff-toggle { flex: none; }
 .summon-picker-col-title {
     font-weight: 700;
@@ -1282,6 +1289,7 @@ html.dark-mode .upgrade-tag { color: #ffd43b; }
 }
 @media (max-width: 600px) {
     #summonPicker { grid-template-columns: 1fr; }
+    .summon-picker-col--span { grid-template-columns: 1fr; }
 }
 .buff-toggle {
     flex: 1;

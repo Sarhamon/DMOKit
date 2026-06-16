@@ -49,7 +49,7 @@ function pullOne(items) {
 function populatePicker() {
     const picker = document.getElementById('summonPicker');
     const activeSection = document.getElementById('summonActiveSection');
-    const columns = [100, 150];
+    const columns = [50, 100, 150];
     picker.innerHTML = columns.map(every => {
         const buttons = summons
             .map((s, i) => ({ s, i }))
@@ -60,7 +60,8 @@ function populatePicker() {
                     <span class="buff-toggle-name">${escapeHtml(s.name)}</span>
                 </label>`
             ).join('');
-        return `<div class="summon-picker-col">
+        const wideClass = every === 50 ? ' summon-picker-col--span' : '';
+        return `<div class="summon-picker-col${wideClass}">
             <div class="summon-picker-col-title">${every}회 천장</div>
             ${buttons}
         </div>`;
