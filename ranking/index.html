@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMO 랭킹 던전 교환 계산기</title>
+    <script>
+        if (localStorage.getItem('dmo_theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <link rel="icon" type="image/png" href="../img/dmo.png">
+    <link rel="stylesheet" href="../css/style.css">
+    <meta property="og:title" content="DMO 랭킹 던전 교환 계산기">
+    <meta property="og:description" content="무한의 투기장 재료 교환 · 목표 아이템 제작까지 필요한 시즌 수를 계산해보세요.">
+    <meta property="og:image" content="../img/dmo.png">
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="../" class="home-link" aria-label="메인 메뉴로">← 메인</a>
+        <div class="header-content">
+            <h2>DMO 랭킹 던전 교환 계산기</h2>
+            <p class="subtitle">무한의 투기장 재료 교환 · 제작까지 필요 시즌 계산</p>
+        </div>
+        <button class="theme-toggle" aria-label="다크모드로 전환" aria-pressed="false">🌙</button>
+    </div>
+
+    <div class="card">
+        <section id="view-exchange">
+            <p class="exp-display">보유 재료와 예상 등급을 입력하고 목표 아이템을 선택하면, 영광의 편린 기준으로 환산해 제작까지 필요한 시즌 수를 계산합니다.</p>
+
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label for="ownPyeonrin">보유 영광의 편린</label>
+                    <input type="number" id="ownPyeonrin" min="0" step="1" value="0">
+                </div>
+                <div class="input-wrapper">
+                    <label for="ownPapyeon">보유 영광의 파편</label>
+                    <input type="number" id="ownPapyeon" min="0" step="1" value="0">
+                </div>
+                <div class="input-wrapper">
+                    <label for="ownJeungpyo">보유 영광의 증표</label>
+                    <input type="number" id="ownJeungpyo" min="0" step="1" value="0">
+                </div>
+                <div class="input-wrapper">
+                    <label for="ownChowol">보유 초월의 증표</label>
+                    <input type="number" id="ownChowol" min="0" step="1" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <label>예상 주간 등급 (×6주)</label>
+                    <div class="journal-radios" id="expWeekly" style="flex-wrap:wrap"></div>
+                </div>
+                <div class="input-wrapper">
+                    <label>예상 시즌 등급</label>
+                    <div class="journal-radios" id="expSeason" style="flex-wrap:wrap"></div>
+                </div>
+                <div class="input-wrapper">
+                    <label>예상 시즌 랭커 순위</label>
+                    <div class="journal-radios" id="expRanker" style="flex-wrap:wrap"></div>
+                </div>
+            </div>
+
+            <div id="exchangeList"></div>
+        </section>
+    </div>
+
+    <div id="exchangeResult" class="ex-float"><span class="ex-float-hint">목표 아이템을 선택하면 자동으로 계산됩니다.</span></div>
+
+    <script type="module" src="../js/ranking/main.js"></script>
+</body>
+</html>

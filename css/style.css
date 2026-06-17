@@ -758,6 +758,53 @@ button.calc-btn.secondary:hover { border-color: var(--accent-color); color: var(
     grid-column: 1 / -1;
     text-align: center;
 }
+.ex-group {
+    align-self: start;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+}
+.ex-group > summary {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+}
+.ex-group[open] > summary { margin-bottom: 8px; }
+.ex-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-color);
+    cursor: pointer;
+    word-break: keep-all;
+    text-align: left;
+}
+#view-exchange { padding-bottom: 80px; }
+.ex-float {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 92%;
+    padding: 12px 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    z-index: 50;
+    text-align: center;
+}
+.ex-float-item { font-weight: 600; color: var(--text-color); word-break: keep-all; }
+.ex-float-time { font-weight: 700; color: var(--accent-color); white-space: nowrap; }
+.ex-float-hint { color: var(--sub-text); }
 .result-card {
     display: flex;
     flex-direction: column;
