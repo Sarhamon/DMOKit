@@ -7,18 +7,6 @@ function listEquiv(rewards) {
     return rewards.reduce((s, { name, qty }) => s + (EQUIV[name] ?? 0) * qty, 0);
 }
 
-// 시즌 수 → 년·개월 (시즌=8주, 1년=52주, 1개월≈4.33주)
-function formatRemaining(seasons) {
-    const totalWeeks = seasons * 8;
-    let years = Math.floor(totalWeeks / 52);
-    let months = Math.round((totalWeeks % 52) / (52 / 12));
-    if (months >= 12) { years += 1; months -= 12; }
-    const parts = [];
-    if (years > 0) parts.push(`${years}년`);
-    if (months > 0) parts.push(`${months}개월`);
-    return parts.length ? parts.join(' ') : '1개월 미만';
-}
-
 // 교환 아이템의 영광의 편린 환산 단가
 function unitCost(item) {
     const cost = item.mats.reduce((s, m) => s + EQUIV[m.name] * m.qty, 0);
@@ -86,7 +74,7 @@ function calculateExchange() {
         timeText = '⚠️ 수급 불가';
     } else {
         const seasons = Math.ceil(remaining / income);
-        timeText = `${formatRemaining(seasons)} [${seasons}시즌]`;
+        timeText = `${seasons * 8}주 / ${seasons}시즌`;
     }
 
     result.innerHTML =
