@@ -13,6 +13,18 @@ function unitCost(item) {
     return cost / item.out;
 }
 
+// 시즌 수 → 년·개월 (시즌=8주, 1년=52주, 1개월≈4.33주)
+function formatYearMonth(seasons) {
+    const totalWeeks = seasons * 8;
+    let years = Math.floor(totalWeeks / 52);
+    let months = Math.round((totalWeeks % 52) / (52 / 12));
+    if (months >= 12) { years += 1; months -= 12; }
+    const parts = [];
+    if (years > 0) parts.push(`${years}년`);
+    if (months > 0) parts.push(`${months}개월`);
+    return parts.length ? parts.join(' ') : '1개월 미만';
+}
+
 function buildExchangeUI() {
     // 등급 라디오 그룹 채우기
     const radio = (group, label, value, checked) =>
@@ -74,21 +86,76 @@ function calculateExchange() {
         timeText = '⚠️ 수급 불가';
     } else {
         const seasons = Math.ceil(remaining / income);
-        timeText = `${seasons * 8}주 / ${seasons}시즌`;
+        const fmt = document.querySelector('input[name="viewFmt"]:checked').value;
+        timeText = fmt === 'ws'
+            ? `${seasons * 8}주 / ${seasons}시즌`
+            : `${formatYearMonth(seasons)} [${seasons}시즌]`;
     }
 
     result.innerHTML =
         `<span class="ex-float-item">${item.name}</span><span class="ex-float-time">${timeText}</span>`;
 }
 
-document.getElementById('exchangeList').addEventListener('change', calculateExchange);
-['ownPyeonrin', 'ownPapyeon', 'ownJeungpyo', 'ownChowol'].forEach(id => {
-    document.getElementById(id).addEventListener('input', calculateExchange);
+const STORE_KEY = 'dmo_ranking_exchange';
+const OWN_IDS = ['ownPyeonrin', 'ownPapyeon', 'ownJeungpyo', 'ownChowol'];
+
+function saveState() {
+    const checked = document.querySelector('input[data-ex]:checked');
+    const state = {
+        fmt: document.querySelector('input[name="viewFmt"]:checked').value,
+        target: checked ? checked.dataset.ex : null,
+        own: OWN_IDS.map(id => document.getElementById(id).value),
+        weekly: document.querySelector('input[name="expWeekly"]:checked').value,
+        season: document.querySelector('input[name="expSeason"]:checked').value,
+        ranker: document.querySelector('input[name="expRanker"]:checked').value,
+    };
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+    let state;
+    try { state = JSON.parse(localStorage.getItem(STORE_KEY)); } catch { state = null; }
+    if (!state) return;
+
+    const setRadio = (name, value) => {
+        const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (el) el.checked = true;
+    };
+    setRadio('viewFmt', state.fmt);
+    setRadio('expWeekly', state.weekly);
+    setRadio('expSeason', state.season);
+    setRadio('expRanker', state.ranker);
+
+    if (Array.isArray(state.own)) {
+        OWN_IDS.forEach((id, i) => {
+            if (state.own[i] !== undefined) document.getElementById(id).value = state.own[i];
+        });
+    }
+    if (state.target) {
+        const t = document.querySelector(`input[data-ex="${state.target}"]`);
+        if (t) {
+            t.checked = true;
+            t.closest('details')?.setAttribute('open', '');
+        }
+    }
+}
+
+function update() {
+    calculateExchange();
+    saveState();
+}
+
+document.getElementById('exchangeList').addEventListener('change', update);
+OWN_IDS.forEach(id => {
+    document.getElementById(id).addEventListener('input', update);
 });
 ['expWeekly', 'expSeason', 'expRanker'].forEach(id => {
-    document.getElementById(id).addEventListener('change', calculateExchange);
+    document.getElementById(id).addEventListener('change', update);
 });
+document.querySelector('input[name="viewFmt"]').closest('.journal-radios').addEventListener('change', update);
 document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
 
 buildExchangeUI();
+loadState();
+calculateExchange();
 loadTheme();
