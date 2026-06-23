@@ -1,5 +1,5 @@
 import { loadTheme, toggleTheme } from '../theme.js';
-import { summons } from './summonData.js';
+import { summons, tierLabel } from './summonData.js';
 import {
     addItems, getTotalCount, getPity, incrementPity, resetPity, subscribe,
 } from './inventory.js';
@@ -62,7 +62,7 @@ function populatePicker() {
             ).join('');
         const wideClass = every === 50 ? ' summon-picker-col--span' : '';
         return `<div class="summon-picker-col${wideClass}">
-            <div class="summon-picker-col-title">${every}회 천장</div>
+            <div class="summon-picker-col-title">${tierLabel(every)}</div>
             ${buttons}
         </div>`;
     }).join('');
@@ -156,7 +156,7 @@ function renderPity() {
         pityDisplay.innerHTML = '';
         return;
     }
-    const cur = getPity(currentSummon.name);
+    const cur = getPity(currentSummon.id);
     const max = currentSummon.pity.every;
     const pct = Math.min(100, (cur / max) * 100);
     pityDisplay.innerHTML = `<div class="pity-row">
@@ -174,11 +174,11 @@ function summon(tickets) {
         results.push({ ...item, _isPity: false });
 
         if (currentSummon.pity) {
-            const counter = incrementPity(currentSummon.name);
+            const counter = incrementPity(currentSummon.id);
             if (counter >= currentSummon.pity.every) {
                 const reward = currentSummon.pity.reward;
                 results.push({ ...reward, _isPity: true });
-                resetPity(currentSummon.name);
+                resetPity(currentSummon.id);
             }
         }
     }

@@ -17,12 +17,15 @@ function saveToStorage(key, value) {
     } catch {}
 }
 
+// U등급이라도 진화 아이템이 아닌 예외 (항상 other)
+const U_OTHER_EXCEPTIONS = new Set(['봉인된 얼티밋 크로스로더']);
+
 let state = loadFromStorage(STORAGE_KEY, { items: {} });
 let pityState = loadFromStorage(PITY_STORAGE_KEY, {});
 
-// 기존 저장분 중 U등급은 모두 진화 아이템으로 정정
+// 기존 저장분 중 U등급은 모두 진화 아이템으로 정정 (예외 제외)
 for (const it of Object.values(state.items)) {
-    if (it.grade === 'U') it.category = 'evolution';
+    if (it.grade === 'U' && !U_OTHER_EXCEPTIONS.has(it.name)) it.category = 'evolution';
 }
 const listeners = new Set();
 
@@ -39,12 +42,13 @@ export function subscribe(fn) {
 
 export function addItems(items) {
     for (const it of items) {
-        // U등급은 모두 진화 아이템으로 분류
-        const category = it.grade === 'U' ? 'evolution' : it.category;
+        // U등급은 모두 진화 아이템으로 분류 (예외 제외)
+        const forceEvolution = it.grade === 'U' && !U_OTHER_EXCEPTIONS.has(it.name);
+        const category = forceEvolution ? 'evolution' : it.category;
         const existing = state.items[it.name];
         if (existing) {
             existing.count++;
-            if (it.grade === 'U') existing.category = 'evolution';
+            if (forceEvolution) existing.category = 'evolution';
             else if (!existing.category && category) existing.category = category;
         } else {
             state.items[it.name] = {

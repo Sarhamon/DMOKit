@@ -2,9 +2,18 @@
 // 각 아이템: { probability, name, grade, category } (category: 'evolution' | 'other')
 // pity.every 회마다 pity.reward를 고정 보장으로 추가 지급.
 
+// 천장 횟수별 소환 등급 라벨 (50: 스페셜, 100: 일반, 150: 프리미엄)
+export function tierLabel(every) {
+    if (every === 50) return '스페셜 데이터 소환';
+    if (every === 100) return '일반 데이터 소환';
+    if (every === 150) return '프리미엄 데이터 소환';
+    return `${every}회 천장`;
+}
+
 export const summons = [
     {
-        name: "퀀텀몬 데이터 소환 (100회 천장)",
+        id: "quantum-normal",
+        name: "퀀텀몬 데이터 소환",
         pity: {
             every: 100,
             reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체][지급용]", grade: "U", category: "other" },
@@ -39,7 +48,8 @@ export const summons = [
         ],
     },
     {
-        name: "퀀텀몬 데이터 소환 (150회 천장)",
+        id: "quantum-premium",
+        name: "퀀텀몬 데이터 소환",
         pity: {
             every: 150,
             reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "other" },
@@ -75,7 +85,8 @@ export const summons = [
         ],
     },
     {
-        name: "프리미엄 데이터 소환: 엔드 오브 어드벤처 (150회 천장)",
+        id: "endofadventure-premium",
+        name: "엔드 오브 어드벤처",
         pity: {
             every: 150,
             reward: { name: "파멸의 근원", grade: "U", category: "other" },
@@ -111,7 +122,8 @@ export const summons = [
         ],
     },
     {
-        name: "일반 데이터 소환: 엔드 오브 어드벤처 (100회 천장)",
+        id: "endofadventure-normal",
+        name: "엔드 오브 어드벤처",
         pity: {
             every: 100,
             reward: { name: "파멸의 근원 [지급용]", grade: "U", category: "other" },
@@ -146,7 +158,8 @@ export const summons = [
         ],
     },
     {
-        name: "프리미엄 데이터 소환: 심연의 공포 (150회 천장)",
+        id: "abyss-premium",
+        name: "심연의 공포",
         pity: {
             every: 150,
             reward: { name: "부패한 데이터", grade: "U", category: "other" },
@@ -182,7 +195,8 @@ export const summons = [
         ],
     },
     {
-        name: "일반 데이터 소환: 심연의 공포 (100회 천장)",
+        id: "abyss-normal",
+        name: "심연의 공포",
         pity: {
             every: 100,
             reward: { name: "부패한 데이터 [지급용]", grade: "U", category: "other" },
@@ -217,7 +231,8 @@ export const summons = [
         ],
     },
     {
-        name: "스페셜 데이터 소환: 어웨이 킹 (50회 천장)",
+        id: "special-awayking",
+        name: "어웨이 킹",
         pity: {
             every: 50,
             reward: { name: "파이널 크로스", grade: "U", category: "other" },
@@ -253,7 +268,8 @@ export const summons = [
         ],
     },
     {
-        name: "스페셜 데이터 소환: 정화의 의식 (50회 천장)",
+        id: "special-purification",
+        name: "정화의 의식",
         pity: {
             every: 50,
             reward: { name: "정화의 의식", grade: "U", category: "other" },

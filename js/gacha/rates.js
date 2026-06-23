@@ -1,6 +1,6 @@
 import { loadTheme, toggleTheme } from '../theme.js';
 import { draws } from './drawData.js';
-import { summons } from './summonData.js';
+import { summons, tierLabel } from './summonData.js';
 import { fusions } from './fusionData.js';
 
 const GRADE_ORDER = ['U', 'SSS+', 'SSS', 'SS+', 'SS', 'S+', 'S', 'A+', 'A', 'N'];
@@ -60,9 +60,12 @@ function gradeSummary(items) {
 
 function populatePoolSelector() {
     const pools = getPools(currentCat);
-    poolSelect.innerHTML = pools.map((p, i) =>
-        `<option value="${i}">${escapeHtml(p.name)}</option>`
-    ).join('');
+    poolSelect.innerHTML = pools.map((p, i) => {
+        const label = currentCat === 'summon' && p.pity
+            ? `${tierLabel(p.pity.every)} · ${p.name}`
+            : p.name;
+        return `<option value="${i}">${escapeHtml(label)}</option>`;
+    }).join('');
 }
 
 function rowHTML(it) {
