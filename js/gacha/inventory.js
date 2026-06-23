@@ -19,6 +19,11 @@ function saveToStorage(key, value) {
 
 let state = loadFromStorage(STORAGE_KEY, { items: {} });
 let pityState = loadFromStorage(PITY_STORAGE_KEY, {});
+
+// 기존 저장분 중 U등급은 모두 진화 아이템으로 정정
+for (const it of Object.values(state.items)) {
+    if (it.grade === 'U') it.category = 'evolution';
+}
 const listeners = new Set();
 
 function notify() {
@@ -34,15 +39,18 @@ export function subscribe(fn) {
 
 export function addItems(items) {
     for (const it of items) {
+        // U등급은 모두 진화 아이템으로 분류
+        const category = it.grade === 'U' ? 'evolution' : it.category;
         const existing = state.items[it.name];
         if (existing) {
             existing.count++;
-            if (!existing.category && it.category) existing.category = it.category;
+            if (it.grade === 'U') existing.category = 'evolution';
+            else if (!existing.category && category) existing.category = category;
         } else {
             state.items[it.name] = {
                 name: it.name,
                 grade: it.grade,
-                category: it.category || 'evolution',
+                category: category || 'evolution',
                 count: 1,
             };
         }
