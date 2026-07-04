@@ -325,7 +325,7 @@ export const summons = [
             { probability: 15.00, name: "맛있는 백금바나나 100개", grade: "S", category: "other" },
             { probability: 15.00, name: "JMT 백금바나나 100개", grade: "S", category: "other" },
             { probability: 20.00, name: "백금 바나나 200개", grade: "A+", category: "other" },
-            { probability: 25.00, name: "스폐셜 치킨 콤보 200개", grade: "A+", category: "other" },
+            { probability: 25.00, name: "스페셜 치킨 콤보 200개", grade: "A+", category: "other" },
         ],
     },
 ];
