@@ -20,7 +20,7 @@
     --runs-badge-bg: #e7f5ff;
     --runs-badge-text: #1c7ed6;
 }
-
+ 
 html.dark-mode {
     --bg-color: #121212;
     --text-color: #e0e0e0;
