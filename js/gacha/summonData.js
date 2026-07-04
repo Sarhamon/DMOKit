@@ -304,4 +304,28 @@ export const summons = [
             { probability: 30, name: "얼티밋 마일리지 쿠폰", grade: "A+", category: "other" },
         ],
     },
+    {
+        id: "costume-advanced",
+        name: "코스튬 데이터 소환 : 상급 코스튬",
+        pity: {
+            every: 50,
+            reward: { name: "코스튬 수선가위", grade: "SSS", category: "other" },
+        },
+        items: [
+            { probability: 0.20, name: "상급 코스튬 제작 쿠폰", grade: "U", category: "other" },
+            { probability: 0.30, name: "최상급 코스튬 수선가위", grade: "SSS+", category: "other" },
+            { probability: 1.05, name: "검은색 정장 [세이버즈] 코스튬 상자", grade: "SSS", category: "other" },
+            { probability: 1.05, name: "큐티 코스튬 상자", grade: "SSS", category: "other" },
+            { probability: 1.40, name: "강화 디지클론 세트 상자", grade: "SS+", category: "other" },
+            { probability: 4.00, name: "테이머 씰 선택 상자", grade: "SS", category: "other" },
+            { probability: 3.00, name: "돌파 옵션 주사위 2개", grade: "SS", category: "other" },
+            { probability: 3.00, name: "디지털 에너지 드링크", grade: "SS", category: "other" },
+            { probability: 5.50, name: "수치 변경 스톤 20개", grade: "S+", category: "other" },
+            { probability: 5.50, name: "옵션 변경 스톤 20개", grade: "S+", category: "other" },
+            { probability: 15.00, name: "맛있는 백금바나나 100개", grade: "S", category: "other" },
+            { probability: 15.00, name: "JMT 백금바나나 100개", grade: "S", category: "other" },
+            { probability: 20.00, name: "백금 바나나 200개", grade: "A+", category: "other" },
+            { probability: 25.00, name: "스폐셜 치킨 콤보 200개", grade: "A+", category: "other" },
+        ],
+    },
 ];
