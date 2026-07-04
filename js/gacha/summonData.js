@@ -306,7 +306,7 @@ export const summons = [
     },
     {
         id: "costume-advanced",
-        name: "코스튬 데이터 소환 : 상급 코스튬",
+        name: "상급 코스튬",
         pity: {
             every: 50,
             reward: { name: "코스튬 수선가위", grade: "SSS", category: "other" },
