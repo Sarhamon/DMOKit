@@ -13,7 +13,7 @@ export function tierLabel(every) {
 export const summons = [
     {
         id: "foresight-premium",
-        name: "미래 예지",
+        name: "태양의 심장",
         pity: {
             every: 150,
             reward: { name: "태양의 심장", grade: "U", category: "other" },
@@ -50,7 +50,7 @@ export const summons = [
     },
     {
         id: "foresight-normal",
-        name: "미래 예지",
+        name: "태양의 심장",
         pity: {
             every: 100,
             reward: { name: "태양의 심장 [지급용]", grade: "U", category: "other" },
@@ -86,7 +86,7 @@ export const summons = [
     },
     {
         id: "quantum-normal",
-        name: "퀀텀몬 데이터 소환",
+        name: "미래 예지",
         pity: {
             every: 100,
             reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체][지급용]", grade: "U", category: "other" },
@@ -122,7 +122,7 @@ export const summons = [
     },
     {
         id: "quantum-premium",
-        name: "퀀텀몬 데이터 소환",
+        name: "미래 예지",
         pity: {
             every: 150,
             reward: { name: "퀀텀몬 디지몬 알-5단계[궁극체]", grade: "U", category: "other" },
