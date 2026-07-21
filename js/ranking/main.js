@@ -1,4 +1,4 @@
-import { WEEKLY_TIERS, SEASON_TIERS, RANKER_TIERS } from './data.js';
+import { NONSEASON_TIERS, SEASON_TIERS, RANKER_TIERS } from './data.js';
 import { EXCHANGE_GROUPS, EQUIV } from './exchange.js';
 import { loadTheme, toggleTheme } from '../theme.js';
 
@@ -19,8 +19,8 @@ function buildExchangeUI() {
         `<label class="radio-option"><span class="label-text">${label}</span><input type="radio" name="${group}" value="${value}"${checked ? ' checked' : ''}></label>`;
     const shortLabel = t => t.label.replace('랭킹 ', '');
 
-    document.getElementById('expWeekly').innerHTML =
-        WEEKLY_TIERS.map((t, i) => radio('expWeekly', shortLabel(t), i, i === 0)).join('');
+    document.getElementById('expNonseason').innerHTML =
+        NONSEASON_TIERS.map((t, i) => radio('expNonseason', shortLabel(t), i, i === 0)).join('');
     document.getElementById('expSeason').innerHTML =
         SEASON_TIERS.map((t, i) => radio('expSeason', shortLabel(t), i, i === 0)).join('');
     document.getElementById('expRanker').innerHTML =
@@ -59,11 +59,11 @@ function calculateExchange() {
         (parseInt(document.getElementById('ownChowol').value) || 0) * 1000;
     const remaining = Math.max(0, totalCost - owned);
 
-    const wi = parseInt(document.querySelector('input[name="expWeekly"]:checked').value);
+    const wi = parseInt(document.querySelector('input[name="expNonseason"]:checked').value);
     const si = parseInt(document.querySelector('input[name="expSeason"]:checked').value);
     const ri = parseInt(document.querySelector('input[name="expRanker"]:checked').value);
     const income =
-        listEquiv(WEEKLY_TIERS[wi].rewards) * 6 +
+        listEquiv(NONSEASON_TIERS[wi].rewards) * 2 +
         listEquiv(SEASON_TIERS[si].rewards) +
         (ri >= 0 ? listEquiv(RANKER_TIERS[ri].rewards) : 0);
 
@@ -74,7 +74,8 @@ function calculateExchange() {
         timeText = '⚠️ 수급 불가';
     } else {
         const seasons = Math.ceil(remaining / income);
-        timeText = `${seasons * 8}주 / ${seasons}시즌`;
+        // 시즌 8주 + 시즌 사이 휴식 1주 (마지막 시즌 뒤 휴식은 제외)
+        timeText = `${seasons * 9 - 1}주 / ${seasons}시즌`;
     }
 
     result.innerHTML =
@@ -89,7 +90,7 @@ function saveState() {
     const state = {
         target: checked ? checked.dataset.ex : null,
         own: OWN_IDS.map(id => document.getElementById(id).value),
-        weekly: document.querySelector('input[name="expWeekly"]:checked').value,
+        nonseason: document.querySelector('input[name="expNonseason"]:checked').value,
         season: document.querySelector('input[name="expSeason"]:checked').value,
         ranker: document.querySelector('input[name="expRanker"]:checked').value,
     };
@@ -105,7 +106,7 @@ function loadState() {
         const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
         if (el) el.checked = true;
     };
-    setRadio('expWeekly', state.weekly);
+    setRadio('expNonseason', state.nonseason);
     setRadio('expSeason', state.season);
     setRadio('expRanker', state.ranker);
 
@@ -132,7 +133,7 @@ document.getElementById('exchangeList').addEventListener('change', update);
 OWN_IDS.forEach(id => {
     document.getElementById(id).addEventListener('input', update);
 });
-['expWeekly', 'expSeason', 'expRanker'].forEach(id => {
+['expNonseason', 'expSeason', 'expRanker'].forEach(id => {
     document.getElementById(id).addEventListener('change', update);
 });
 document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
