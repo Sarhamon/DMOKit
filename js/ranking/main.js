@@ -62,9 +62,11 @@ function calculateExchange() {
     const wi = parseInt(document.querySelector('input[name="expNonseason"]:checked').value);
     const si = parseInt(document.querySelector('input[name="expSeason"]:checked').value);
     const ri = parseInt(document.querySelector('input[name="expRanker"]:checked').value);
-    // 체크포인트 편린: 10라운드마다 15개, 던전 3회(비시즌 2 + 시즌 1) 모두 반영
+    // 체크포인트 편린: 10라운드마다 15개.
+    // 시즌 던전(1회)은 100라운드 보스 포함, 비시즌 던전(2회)은 100라운드 보스 보상 제외.
     const round = parseInt(document.getElementById('clearRound').value) || 0;
-    const checkpointPyeonrin = Math.floor(round / 10) * 15 * 3;
+    const cp = Math.floor(round / 10);
+    const checkpointPyeonrin = (cp + Math.min(cp, 9) * 2) * 15;
     const income =
         listEquiv(NONSEASON_TIERS[wi].rewards) * 2 +
         listEquiv(SEASON_TIERS[si].rewards) +
